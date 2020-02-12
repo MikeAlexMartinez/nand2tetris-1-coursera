@@ -76,7 +76,7 @@ therefore,
 Any Boolean function can be represented using an expression containing AND and NOT
 operations.
 
-  Proof: (x OR y) = NOT(NOT(x) AND NOT(y))
+  Proof: (a OR b) = NOT(NOT(a) AND NOT(b))
 
 #### the holy NAND
 
@@ -99,7 +99,6 @@ Proof:
 2. (x AND y) = NOT(x NAND y)
 
 ### Logic Gates
-
 
 
 
