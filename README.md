@@ -1,8 +1,9 @@
 # Nand 2 Tetris Course - Part One - Coursera
 
 
-
 ## Week One - Boolean Functions and Gate Logic
+
+Introduction to Boolean Functions and building gates
 
 ### Boolean Logic
 
@@ -15,25 +16,16 @@ and then defines the possible outputs when processed by a given Boolean function
 
 e.g. Given f(x, y, z) = (x AND y) OR (NOT(x) AND z)
 
-  ----------------------
-  | x | y | z | Output |
-  ----------------------
-  | 0 | 0 | 0 |   0    |
-  ----------------------
-  | 0 | 0 | 1 |   1    |
-  ----------------------
-  | 0 | 1 | 0 |   0    |
-  ----------------------
-  | 0 | 1 | 1 |   1    |
-  ----------------------
-  | 1 | 0 | 0 |   0    |
-  ----------------------
-  | 1 | 0 | 1 |   0    |
-  ----------------------
-  | 1 | 1 | 0 |   1    |
-  ----------------------
-  | 1 | 1 | 1 |   1    |
-  ----------------------
+| x | y | z | Output |
+|---|---|---|--------|
+| 0 | 0 | 0 |   0    |
+| 0 | 0 | 1 |   1    |
+| 0 | 1 | 0 |   0    |
+| 0 | 1 | 1 |   1    |
+| 1 | 0 | 0 |   0    |
+| 1 | 0 | 1 |   0    |
+| 1 | 1 | 0 |   1    |
+| 1 | 1 | 1 |   1    |
 
 #### Boolean Identities
 
@@ -66,4 +58,51 @@ figure out if the expression matches the truth table of another known
 expression.
 
 ### Boolean Function Synthesis
+
+To derive a function from a truth table you should create a function
+for each line of the truth table that outputs a 1. And then you append
+an Or between each line. Once this is done you can then simplify the statement
+using the laws above.
+
+Example f(x, y, z) = NOT(x AND y) AND NOT(z)
+
+
+
+Any Boolean function can be represented using an expression containing AND, OR and NOT
+operations.
+
+therefore,
+
+Any Boolean function can be represented using an expression containing AND and NOT
+operations.
+
+  Proof: (x OR y) = NOT(NOT(x) AND NOT(y))
+
+#### the holy NAND
+
+NAND(a, b) = NOT(a AND b)
+
+| a | b | Out |
+|---|---|-----|
+| 0 | 0 |  1  |
+| 0 | 1 |  1  |
+| 1 | 0 |  1  |
+| 1 | 1 |  0  |
+
+Anu Boolean function can be represented using an expression containing only NAND operations.
+
+Because all Boolean functions can be represented with NOT and AND gates, we just need
+to prove that NOT and AND can be constructed with NAND
+
+Proof:
+1. NOT(x) = (x NAND x)
+2. (x AND y) = NOT(x NAND y)
+
+### Logic Gates
+
+
+
+
+
+### HDL - Hardware Description Language
 
