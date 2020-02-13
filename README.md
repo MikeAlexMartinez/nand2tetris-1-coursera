@@ -105,3 +105,24 @@ Proof:
 
 ### HDL - Hardware Description Language
 
+
+
+### Project 1 - Chips to Implement
+
+And - Done
+Or - Done
+Not - Done
+Xor
+Mux
+DMux
+
+And16
+Not16
+Or16
+Mux16
+
+Or8Way
+Mux8Way16
+Mux4Way16
+DMux4Way
+DMux8Way
