@@ -112,17 +112,17 @@ Proof:
 And - Done
 Or - Done
 Not - Done
-Xor
-Mux
-DMux
+Xor - Done
+Mux - Done
+DMux - Done
 
-And16
-Not16
-Or16
-Mux16
+And16 - Done
+Not16 - Done
+Or16 - Done
+Mux16 - Done
 
-Or8Way
-Mux8Way16
-Mux4Way16
-DMux4Way
+Or8Way - Done
+Mux4Way16 - Done
+Mux8Way16 - Done
+DMux4Way - 
 DMux8Way
