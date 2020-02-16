@@ -109,20 +109,58 @@ Proof:
 
 ### Project 1 - Chips to Implement
 
-And - Done
-Or - Done
-Not - Done
-Xor - Done
-Mux - Done
-DMux - Done
+Easy Chips
+- And - Done
+- Or - Done
+- Not - Done
+- Xor - Done
+- Mux - Done
+- DMux - Done
 
-And16 - Done
-Not16 - Done
-Or16 - Done
-Mux16 - Done
+Buses
+- And16 - Done
+- Not16 - Done
+- Or16 - Done
+- Mux16 - Done
 
-Or8Way - Done
-Mux4Way16 - Done
-Mux8Way16 - Done
-DMux4Way - 
-DMux8Way
+Splitters
+- Or8Way - Done
+- Mux4Way16 - Done
+- Mux8Way16 - Done
+- DMux4Way - Done
+- DMux8Way - Done
+
+## Week Two - Boolean Arithmetic and the ALU Roadmap
+
+### Binary Numbers
+
+Using binaries you can represent groups of binary values to represent
+numbers.
+
+Maximum with k bits is 1 + 2 + 3 + ... + $2^{k-1}$ = $2^{k}-1$
+
+If you have 8 bits you can represent 256 different things.
+Could be:
+- 0 to 255 or
+- -127 to 127
+
+Decimal -> Binary, what is the largest power of 2 that fits into the current
+number.
+
+99 = 64 + 32 + 2 + 1 = 1100011
+
+### Binary Addition
+
+Maniplutating Binary Numbers.
+
+Once you can add, you can almost do most operations. You can also postpone more
+complex operations like multiplication to software, however, modern computers don't
+necessarily do this in practice.
+
+Adding in binary is the same in practice as base-10 numbers. you add two values together
+and carry 1's when the value exceeds the allows number (1).
+
+      01111101
+    + 00110110
+    = 10110011
+carry  1111
