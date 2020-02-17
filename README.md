@@ -164,3 +164,174 @@ and carry 1's when the value exceeds the allows number (1).
     + 00110110
     = 10110011
 carry  1111
+
+Often when a number overflows we do nothing.
+
+#### Building an Adder
+
+##### Half Adder
+
+Only cares about the following, a, b and the resulting sum and carry.
+e.g. 1 + 1 = sum of 0, carry of 1
+
+A half adder chip interface:
+
+CHIP HalfAdder {
+  IN a, b;
+  OUT sum, carry;
+  PARTS:
+    // Put your code here
+}
+
+| a | b | sum | carry |
+|---|---|-----|-------|
+| 0 | 0 |  0  |   0   |
+| 0 | 1 |  1  |   0   |
+| 1 | 0 |  1  |   0   |
+| 1 | 1 |  0  |   1   |
+
+##### Full Adder
+
+A full adder is similar to a half adder exep it also cares about the 
+inital carry forward from any previous additions.
+
+Therefore the chip truth table looks like so:
+
+| a | b | c | sum | carry |
+|---|---|---|-----|-------|
+| 0 | 0 | 0 |  0  |   0   |
+| 0 | 0 | 1 |  1  |   0   |
+| 0 | 1 | 0 |  1  |   0   |
+| 0 | 1 | 1 |  0  |   1   |
+| 1 | 0 | 0 |  1  |   0   |
+| 1 | 0 | 1 |  0  |   1   |
+| 1 | 1 | 0 |  0  |   1   |
+| 1 | 1 | 1 |  1  |   1   |
+
+And it's interface:
+
+CHIP FullAdder {
+  IN a, b, c;
+  OUT sum, carry;
+  PARTS:
+    // Put your code here
+}
+
+##### Multi-bit Adder
+
+This first uses a half adder and then 
+progresses on to use full adders for the remaining steps.
+
+A 16-bit adder takes the following:
+out = a + b, as 16-bit integers. (overflow ignored)
+
+CHIP Add16 {
+  IN a[16], b[16];
+  OUT out[16];
+  PARTS:
+    // Put your code here
+}
+
+### Negative Numbers
+
+Most simple approach for representing negative numbers in computers
+starts by using left most bit to denote whether something is negative
+or positive and then the rest of the numbers are represented as per normal using
+the remaining bits. This approach can lead to issues as 0 will have to internal
+representations and all logic needs to be aware of the sign of the sum.
+
+A more common modern approach is called 2's complement.
+
+0000 =  0
+0001 =  1
+0010 =  2
+0011 =  3
+0100 =  4
+0101 =  5
+0110 =  6
+0111 =  7
+1000 = -8 = 0 - $2^{n-1}$ where n = number of bits.
+1001 = -7 = 1 - 8
+1010 = -6 = 2 - 8
+1011 = -5 = 3 - 8
+1100 = -4 = 4 - 8 
+1101 = -3 = 5 - 8
+1110 = -2 = 6 - 8
+1111 = -1 = 7 - 8
+
+
+Represent the Negative number ising the positive number: $2^{n}-x$
+
+The range is as follow:
+- Positive numbers: $0 ... 2^{n-1}-1$
+- Negative numbers: $-1 ... -2^{n-1}-1$
+
+Addition in 2's Complement (for Free)
+
+  -2      14       1110
++ -3    + 13    +  1101
+= -5    = 11    = 11011
+
+11011 = 27
+ 1011 = 11 which in 2's complement = -5
+
+e.g. 7 + -5 = 2
+
+         0111  
+    +    1011
+    = (1)0010 = 2 in 2's Complement
+carry (1)111
+
+#### Computing negative x
+
+Given an input x we need to output -x
+
+Idea: $2^{n} - x = 1 + (2^{n}-1) - x$
+
+$2^{n} = 11111111$
+to minus a number, you you can flip the bits, and then add a 1.
+
+e.g.
+
+Input: 4 = 0100
+
+ 1111
+-0100 (flip the bits)
+=1011
++   1 (add one)
+=1100
+
+Output: -4 = 1100
+
+### Arithmetic Logic Unit
+
+Von Neumann Architechure
+              Computer System
+       |-------------------------|
+       |                  CPU    |
+       |           ->            |
+Input -|->  Memory        ALU   -|-> Output
+       |           <-            |
+       |               Control   |
+       |-------------------------|
+
+The ALU computes a function on the two inputs, and outputs the result
+
+i.e. f(input1, input2) => Output
+
+f: one out of a family of pre-defined arithmetic amnd logical functions
+- Arithmetic Operations, integer addition, multiplication, division...
+- Logical operations: And, Or, Xor, ...
+
+Which operations should the ALU perform? A hardware / software tradeoff...
+
+#### The Hack ALU
+
+- Operates on two 16-bit, two's complement values
+- Outputs a 16-bit, two's complement value
+- Which function to compute is set by six 1-bit inputs
+- Computes one out of a family of 18 functions
+- Also outputs two 1-bit values (to be discussed)
+
+Functional specification (truth table of chip) can be view in project comparison file.
+
