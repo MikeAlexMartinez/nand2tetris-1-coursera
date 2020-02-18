@@ -335,3 +335,54 @@ Which operations should the ALU perform? A hardware / software tradeoff...
 
 Functional specification (truth table of chip) can be view in project comparison file.
 
+Possible outputs:
+Add truth table here 0
+Add truth table here 1
+Add truth table here -1
+Add truth table here x
+Add truth table here y
+Add truth table here !x
+Add truth table here !y
+Add truth table here -x
+Add truth table here -y
+Add truth table here x+1
+Add truth table here y+1
+Add truth table here x-1
+Add truth table here y-1
+Add truth table here x+y
+Add truth table here x-y
+Add truth table here y-x
+Add truth table here x&y
+Add truth table here x|y
+
+Control Bits: (These happen in order, so zx would be run before nx)
+PreSetting Inputs:
+- zx: if zx is 1 set x to 0
+- nx: if nx then x = !x
+- zy: if zy is 1 then set y to 0
+- ny: if ny then y = !y
+Compute setting:
+- f: if f then out=x+y else out=x&y
+Post-setting the output
+- no: if no then out=!out
+
+out(x, y)=...
+
+x = 0
+y = 1
+out = 1
+out = 0
+
+output control bits
+if out == 0 then zr = 1, else zr = 0
+if out < 0 then ng = 1, else ng = 0
+
+##### The Hack ALU is
+- simple
+- elegant
+- easy to implement
+  - set 16-bit value to 0000000000000000
+  - set 16-bit value to 1111111111111111
+  - Negate a 16-bit value (bit-wise)
+  - Compute + or & on two 16-bit values
+
