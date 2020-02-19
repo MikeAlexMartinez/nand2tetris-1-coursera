@@ -386,3 +386,120 @@ if out < 0 then ng = 1, else ng = 0
   - Negate a 16-bit value (bit-wise)
   - Compute + or & on two 16-bit values
 
+### Project 2
+
+- You can use all chips developed thus far.
+
+Need to build the following chips:
+- HalfAdder
+- FullAdder
+- Add16
+- Inc16
+- ALU
+
+#### Half Adder
+
+Can be built using two elementary gates
+
+a -> Half Adder -> Sum
+b ->            -> Carry
+
+##### Chip starter code
+
+CHIP HalfAdder {
+  IN a, b;
+  OUT sum, carry;
+
+  PARTS:
+  // Put your code here
+}
+
+##### Truth Table
+
+| a | b | sum | carry |
+|---|---|-----|-------|
+| 0 | 0 |  0  |   0   |
+| 0 | 1 |  1  |   0   |
+| 1 | 0 |  1  |   0   |
+| 1 | 1 |  0  |   1   |
+
+#### Full Adder
+
+Can be built from two half adders and some 'glue'
+
+a ->            -> Sum
+b -> Full Adder -> Carry
+c ->
+
+##### Chip starter code
+
+/** Computes the sum of two bits. **/
+CHIP FullAdder {
+  IN a, b, c;
+  OUT sum, carry;
+
+  PARTS:
+  // Put your code here
+}
+
+##### Truth Table
+
+| a | b | c | sum | carry |
+|---|---|---|-----|-------|
+| 0 | 0 | 0 |  0  |   0   |
+| 0 | 0 | 1 |  1  |   0   |
+| 0 | 1 | 0 |  1  |   0   |
+| 0 | 1 | 1 |  0  |   1   |
+| 1 | 0 | 0 |  1  |   0   |
+| 1 | 0 | 1 |  0  |   1   |
+| 1 | 1 | 0 |  0  |   1   |
+| 1 | 1 | 1 |  1  |   1   |
+
+#### 16-bit adder
+
+- An n-bit adder can be built from n full-adder chips
+- The carry bit is "piped" from right to left
+- The MSB carry bit is ignored
+
+##### Chip starter code
+
+/**
+ * Adds two 16-bit, 2's-complement values.
+ * The most-significant carry bit is ignored
+ */
+CHIP Add16 {
+  IN a[16], b[16];
+  OUT out[16];
+
+  PARTS:
+  // Put your code here
+}
+
+#### 16-bit incrementor
+
+- Simple version of an adder.
+- Single  
+
+###### Chip starter code
+
+/**
+ * Outputs in + 1.
+ * The most-significant carry bit is ignored
+ */
+CHIP Inc16 {
+  IN in[16];
+  OUT out[16];
+
+  PARTS:
+  // Put your code here
+}
+
+#### ALU -> See project files
+
+You can build this chip using the 16 bit adder and various
+chips from project 1. Can be build with less than 20 lines
+of HDL code.
+
+### Perspectives
+
+You can speed up an adder by using carry lookahead.
