@@ -395,6 +395,7 @@ Need to build the following chips:
 - FullAdder
 - Add16
 - Inc16
+- ALU (no-stat)
 - ALU
 
 #### Half Adder
