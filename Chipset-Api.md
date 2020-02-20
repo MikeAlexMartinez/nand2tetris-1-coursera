@@ -21,17 +21,17 @@ Mux8Way16(a= ,b= ,c= ,d= ,e= ,f= ,g= ,h= ,sel= ,out= );
 DMux4Way(in= ,sel= ,a= ,b= ,c= ,d= ); 
 DMux8Way(in= ,sel= ,a= ,b= ,c= ,d= ,e= ,f= ,g= ,h= ); 
 
-
+HalfAdder(a= ,b= ,sum= , carry= ); 
+FullAdder(a= ,b= ,c= ,sum= ,carry= );  
 Add16(a= ,b= ,out= ); 
+Inc16(in= ,out= ); 
 ALU(x= ,y= ,zx= ,nx= ,zy= ,ny= ,f= ,no= ,out= ,zr= ,ng= );
+
 ARegister(in= ,load= ,out= ); 
 Bit(in= ,load= ,out= ); 
 CPU(inM= ,instruction= ,reset= ,outM= ,writeM= ,addressM= ,pc= ); 
 DFF(in= ,out= ); 
 DRegister(in= ,load= ,out= ); 
-FullAdder(a= ,b= ,c= ,sum= ,carry= );  
-HalfAdder(a= ,b= ,sum= , carry= ); 
-Inc16(in= ,out= ); 
 Keyboard(out= ); 
 Memory(in= ,load= ,address= ,out= ); 
 PC(in= ,load= ,inc= ,reset= ,out= ); 
