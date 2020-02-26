@@ -16,5 +16,16 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    // create incremented value
+    Inc16(in=state, out=stateInc);
+
+    // should use incremented input
+    Mux16(a=state, b=stateInc, sel=inc, out=s1);
+    // should use loaded input
+    Mux16(a=s1, b=in, sel=load, out=s2);
+    // should reset to zero
+    Mux16(a=s2, b=false, sel=reset, out=s3);
+
+    // always take input, give output and feedback for future calcs
+    Register(in=s3, load=true, out=out, out=feedback);
 }

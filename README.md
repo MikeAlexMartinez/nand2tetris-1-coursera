@@ -504,3 +504,150 @@ of HDL code.
 ### Perspectives
 
 You can speed up an adder by using carry lookahead.
+
+## Week Three - Sequential Logic and RAM
+
+Hello, time.
+We want to use the same hardware over time.
+We also want to remember state.
+Computers have a finite speed.
+
+The clock - The clock is an oscillator that allows us to conceptualise time
+as a single round of oscillations from 1 to 0. So time is a series of 
+integer steps.
+
+Combinatorial Logic Vs. Sequential Logic
+
+Combinatoral: out[t] = function( in[t] )
+Sequential: out[t] = function( in[t-1] )
+
+### Flip Flops
+
+| Time  | 1    2    3
+|-------|
+| State | 
+
+Moving information from time t-1 to time t is still missing. The element,
+needs to remember a bit and carry it forward. It requires state. These types
+of chips can flip and flop from 0 and to 1.
+
+A Clocked Flip Flop.
+
+in -> DFF -> Out
+
+out[t] = in[t-1]. Triangle on chip indicates the chip has state.
+
+Sequential Logic Implementation: Sits after Combinatorial logic and output, 
+allowing us to store information or feed it back to the system as and when 
+required.
+
+Remembering Forever:
+Goal: Remeber an input bit "forever" until requested to load a new value. 
+
+1-Bit Register utilises a DFF and a Mux input to decide whehter to use the 
+current input or the new input.
+
+### Memory Units
+
+Different Types of memory:
+- Main memory: RAM,
+- Secondary memory: disks, etc
+- Volatile / non-volatile
+
+RAM:
+- Data
+- Instructions
+
+Perspective:
+- Physical
+- Logical
+
+w (word width): 16-bit, 32-bit, 64-bit
+
+Most basic memory unit is a register.
+
+Registers State - The value which is currently stored inside the register.
+
+To remember a value, the load needs to be set to 1, and the input will be 
+the value that needs to be remembered. the output value will now be 
+available as the new value on the next cycle.
+
+RAM Abstaction: a sequence of n addressable registers, with addresses 0 to 
+n-1.
+
+At any point in time, only one register in the RAM is selected.
+
+The input is called address.
+
+k width of address input = k = log2n
+
+RAM is a sequential chip, with a clocked behaviour.
+
+To read register, set register to i, and the out will reflect this.
+
+To set register:
+- set address to i
+- set in = v
+- set load = 1
+
+### Counters
+
+- Computer must keep track of which instruction should be fetched and executed next
+- This control mechanism can be realised by a Program Counter
+- The PC contains teh address of the instruction that will be fetched and executed next
+- Three possible control settings:
+  1. Reset: fetch first instruction
+  2. Next: Fetch next instruction
+  3. GoTo: fetch instrcution n
+
+A chip that realises the described abstraction.
+
+### Project Overview - Week 3
+
+Can use all build chips & Data Flip flop (DFF gate)
+
+Goal: Build the following chips:
+- 1-Bit
+- Register
+- RAM8
+- RAM64
+- RAM512
+- RAM4K
+- RAM16K
+- PC
+
+#### 1-Bit
+
+Can be build from Dmux and DFF.
+
+if load then {
+  Bit's state = in
+  // from next cycle onwards:
+  out emits the new state
+}
+else out emits the same value as that of the previous cycle
+
+#### Register (16-bit)
+
+Add wiring to 16 1 bit registers
+
+#### RAM8K
+
+- Feed the in value to all the registers, simultaneously.
+- Use  mux / demux chips to select the right register
+
+#### RAM n K
+
+- stack RAM chips to create larger RAM chips.
+- Think about the rams address input as consisting of two fields;
+  - One field can be used to select a RAM-part;
+  - The other field can be used to seelct a register within the RAM-part
+- Use mux / demux logic to affect this addressing issue
+
+#### PC - Program Counter
+
+Can be built from a register, an incrementor, and some logic gates.
+
+
+
+
