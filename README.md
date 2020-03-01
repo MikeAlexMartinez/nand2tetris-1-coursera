@@ -649,5 +649,270 @@ Add wiring to 16 1 bit registers
 Can be built from a register, an incrementor, and some logic gates.
 
 
+## Week Four - Machine Languages
 
+Same Hardware can run many different Software programs.
+
+Universal Turing Machine - Can simulate any machine
+Von Neumann Architecture - Puts Theory into practice
+
+Hardware needs to know, what to do, and where to do it.
+
+People use High level languages which are then compiled into
+machine language which allows the hardware to know what to do.
+
+Mnemonics : BReaks down collections of bits, into their
+component instructions. e.g.
+
+| 0100010 | 0011 | 0010 |
+|----|---|---|
+| ADD | R3 | R2 |
+
+By allowing users to use machine language instructions by
+converting symbolic language into the corresponding bits.
+
+### Machine Language Elements
+
+- Specification of the Hardware / Software interface
+  - What are the supported operations
+  - What do they operate on
+  - How is the program controlled
+
+- Usually in close correspondence to actual Hardware architecture
+  - Not necesseraily so
+
+- Cost-Performance Tradeoff
+  - Silicon Area
+  - Time to Complete Instruction
+
+Machine Operations
+- Usually correspond to whats implemented in the hardware
+  - Arithmetic operations: add, subtract etc
+  - Logical Operations: and, or
+  - Flow Control: "goto instructionX', if C goto instruction Y
+
+- Differences between machine languages
+  - Richness of the set of operations
+  - Data Types
+
+- Addressing
+  - Accessing memory is expensive
+    - need to supply a long address
+    - Getting the memory contents into the CPU takes time
+
+You have sequence of memories that allow you to access certain
+working memory faster. These are certain caches.
+
+CPUs Normally have a few a very easy to access registers.
+
+These could contain data, or even an address for memory that is contained
+in a different part of the computer.
+
+Addressing Modes:
+- Register: Add R1, R2
+- Direct: Add R2, M[200]
+- Indirect: Add R1, @A
+- Immediate: Add 73, R1
+
+Input / Output
+
+- Many types of input and output devices
+  - Keyboard, mouse, camera, sensors, printers, screen, sound...
+- CPU needs some kind of protocol to talk to each of them.
+  - Software "Drivers" know these protocols
+- One general method of interaction uses "memory mapping"
+  - Memory location 12345 holds direction of the last movement
+    of the mouse
+  - Memory location 45678 is not a real memory location but a way to tell
+    the printer which paper to use
+
+Flow Control:
+- Usually the cPU executes machine instructions in sequence
+- Sometimes we need to jump unconditionally to another location
+- Sometimes a loop might be conditional
+
+### The Hack Computer and Machine Language
+
+A 16-bit machine consisting of:
+Instruction Memory -> CPU <-> Data memory
+
+Data Memory RAM: a sequence of 16-bit registers:
+  RAM[0], RAM[1]...
+
+INstruction memory (ROM): a seuqence of 16-bit registers
+
+CPU: performs 16-bit instructions
+
+Instruction bus / data bus / address buses
+
+Has a reset button
+
+Hack Machine languages:
+- 16-bit A-instructions
+- 16-bit C-instructions
+
+Hack program - sequence of instructions written in
+  hack machine language
+
+Control:
+- The ROM is loaded with a HACK program
+- The reset button is pushed
+- The program is loaded into the ROM
+
+HAck computer: 3 registers
+A register - 16 bit
+D register - 16 bit
+M register - only one is every selected
+
+The A instruction:
+Syntax @Value
+where value is either:
+- a non-negative decimal constant or
+- a symbol referring to such a constant (later)
+
+Semantics:
+- Set the A register to value
+- Side Effect: RAM[A] becomes the selected RAM register
+
+Example: @21
+Effect
+- sets the A register to 21
+- RAM[21] becomes the selected RAM register
+- M=-1 // RAM[21] = -1 (the selected memory now = -1)
+
+The C instruction
+dest = comp ; jump (both dest and jump are optional)
+
+dest = null, M, D, MD, A, AM, AD, AMD
+
+jump = null, JGT, JEQ, JGE, JLT, JNE, JLE, JMP
+
+Semantics: 
+- Computes the value of comp
+- Stores the result in dest
+- If the boolean expression (comp jump 0) is true,
+- jumps to execture the instruction stored in ROM[A].
+
+Example:
+// set the D register to -1
+D=-1
+// Set RAM[300] to the value of the D register minus 1
+@300
+M=D-1
+// If D-1==0 jump to execute the instruction stored in ROM[56]
+@56 // A=56
+D-1;JEQ // if (d-1==0) goto 56
+
+// unconditional Jump
+0; JMP
+
+### Hack Language Specification
+
+The A instruction
+
+Symbolic = @value = @21
+Binary = @value = 0 000000000010101
+
+### C instruction
+dest = comp; jump
+
+bit
+1 1 - opcode
+2 1 - not used
+3 1 - not used
+a  comp bits
+c1 
+c2
+c3
+c4
+c5
+c6
+d1 dest bits
+d2
+d3
+j1 jump bits
+j2
+j3
+
+#### Comp Truth Table
+
+| comp ||       c1 | c2 | c3 | c4 | c5 | c6 |
+| 0    |      | 1  | 0  | 1  | 0  | 1  | 0  |
+| 1    |      | 1  | 1  | 1  | 1  | 1  | 1  |
+| -1   |      | 1  | 1  | 1  | 0  | 1  | 0  |
+| D    |      | 0  | 0  | 1  | 1  | 0  | 0  |
+| A    | M    | 1  | 1  | 0  | 0  | 0  | 0  |
+| !D   |      | 0  | 0  | 1  | 1  | 0  | 1  |
+| !A   | !M   | 1  | 1  | 0  | 0  | 0  | 1  |
+| -D   |      | 0  | 0  | 1  | 1  | 1  | 1  |
+| -A   | -M   | 1  | 1  | 0  | 0  | 1  | 1  |
+| D+1  |      | 0  | 1  | 1  | 1  | 1  | 1  |
+| A+1  | M+1  | 1  | 1  | 0  | 1  | 1  | 1  |
+| D-1  |      | 0  | 0  | 1  | 1  | 1  | 0  |
+| A-1  | M-1  | 1  | 1  | 0  | 0  | 1  | 0  |
+| D+A  | D+M  | 0  | 0  | 0  | 0  | 1  | 0  |
+| D-A  | D-M  | 0  | 1  | 0  | 0  | 1  | 1  |
+| A-D  | M-D  | 0  | 0  | 0  | 1  | 1  | 1  |
+| D&A  | D&M  | 0  | 0  | 0  | 0  | 0  | 0  |
+| DorA | DorM | 0  | 1  | 0  | 1  | 0  | 1  |
+| a=0  | a=1  |
+
+#### Dest mapping
+
+| dest | d1 | d2 | d3 | effect: the value is stored in |
+| null | 0 |  0 |  0 |  Value is not stored |
+| M    | 0 |  0 |  1 |  M register |
+| D    | 0 |  1 |  0 |  D register |
+| MD   | 0 |  1 |  1 |  M register and D register |
+| A    | 1 |  0 |  0 |  A register |
+| AM   | 1 |  0 |  1 |  A register and M register |
+| AD   | 1 |  1 |  0 |  A register and D register |
+| AMD  | 1 |  1 |  1 |  A register, RAM[A] and D register |
+
+#### Jump Mapping
+
+| dest | j1 | j2 | j3 | effect |
+| null | 0 |  0 |  0 |  jump |
+| JGT  | 0 |  0 |  1 |  if out > 0 |
+| JEQ  | 0 |  1 |  0 |  if out = 0 |
+| JGE  | 0 |  1 |  1 |  if out >= 0 |
+| JLT  | 1 |  0 |  0 |  if out < 0 |
+| JNE  | 1 |  0 |  1 |  if out != 0 |
+| JLE  | 1 |  1 |  0 |  if out <= 0 |
+| JMP  | 1 |  1 |  1 |  unconditional |
+
+### Hack Program
+
+- A hack program is  a sequence of Hack instructions
+- White space is permitted
+- Comments are used to explain code
+- There are better ways to write code (using symbols for example)
+
+### Input / Output
+
+Peripheral Devices
+- Keyboard
+- Screen
+
+High-Level approach - Sophisticated software libraries enabling text, graphics, animation
+audio, video, etc
+
+Low-level - bits
+
+#### Screen Memory map
+
+Dedicated to manage a display unit
+The physical display is continuosly refreshed from the memory map, many times per second.
+Output is effected by writing code that manipulates the screen memory map.
+
+Screen is 256x512, b/w. height by width.
+Can only access 16-bits in one chunk.
+
+8191 bytes of memory for screen (each bit corresponds to a single pixel)
+32 bytes per row.
+
+1. word = screen[32*row + col/16]
+   word = RAM[16834(base-address) + 32*row + col/16]
+2. Set the (col % 16)th bit of work to 0 or 1
+3. Commit word to RAM
 
