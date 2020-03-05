@@ -916,3 +916,174 @@ Can only access 16-bits in one chunk.
 2. Set the (col % 16)th bit of work to 0 or 1
 3. Commit word to RAM
 
+#### Keyboard memory map
+
+The keyboard has a single register that contains any key
+if any that is being pressed.
+
+The HACK Character set is a smaller version of ASCII.
+
+RAM[24576] is where the keyboard memory map lives in the HACK computer.
+
+### The Hack Prgramming Language part one
+
+You can use the CPU Emulator to test symbolic code.
+
+4.6 - Working with registers and memory
+
+D - data register
+A - address / data register
+M - The currently selected register
+
+Examples:
+// D=10
+@10 // select D 10
+D=A
+
+// D++
+D=D+1
+
+// D=RAM[17]
+@17
+D=M
+
+// RAM[17]=0
+@17
+M=0
+
+// RAM[17]=10
+@10
+D=A
+@17
+M=D
+
+// RAM[5] = RAM[3]
+@3
+D=M
+@5
+M=D
+
+Best practice is to end program with an infinite loop.
+Want to avoid noop attacks.
+
+#### Built In Symbols
+Hack assembly language has builtin symbols
+R0 = 0
+R1 = 1
+R2 = 2
+... ...
+R15=15
+
+These symbols can be used to denote "Virtual Registers"
+
+instead of:
+// RAM[5]=15
+@15
+D=A
+
+@5
+M=D
+
+should use:
+// RAM[5]=15
+@15
+D=A
+
+@R5 // this becomes @5
+M=D
+
+!!! Hack is case-sensitive !!!
+
+SCREEN = 16384
+KDB = 24576
+
+SP = 0
+LCL = 1
+ARG = 2
+THIS = 3
+THAT = 4
+
+#### Hack Language Unit 2
+4.7 - Branching, Variables and Iteration
+
+Branching - Only one branching apparatus in ML
+JUMP or GOTO
+
+Example in Signum.asm
+
+Even seemingly simple tasks in Machine code can result in
+obtuse and difficult to understand code.
+
+"Instead of imagining that our main task as programmers
+is to instruct a computer what to do, let us
+concentrate rather on explaining to human being what
+we want a computer to do." - Donald Knuth
+
+##### Labels
+
+Label declarations can make the code more descriptive,
+but do not generate a code / aren't translated
+
+Each reference to a label is replaced with a reference
+to the instruction number following that label's
+declaration.
+
+##### Variable
+
+An abstraction to a container that has a name and a value
+
+an example of
+@temp - find an available register, and use it to represent the variable temp.
+
+For example, the assembler might assign a variable to a specific memory address 
+
+- A reference to a symbol that has no corresponding label declaration is treated as 
+  a reference to a variable
+- Variables are allocated from the RAM address 16 onward
+
+You can load a program anywhere into memory as long as you know the base address of 
+the program, i.e. once you know where it should begin and end.
+
+Best Practice:
+1. Design program in Psuedocode
+2. Write the program in assembly language
+3. Test the program (on paper) using the variable-value trace table
+
+##### Iteration
+
+// Program
+
+#### 4.8 - Pointers, Input & Output
+
+##### Pointers
+
+- Variables that store memory addresses, like arr and i, are called pointers.
+
+- Hack pointer logic: Whenever we have to access memory using a pointer we need an
+instruction like A=M
+- Typical pointer semantics: "set the address register to the contents of some memory
+register"
+
+Two standard input and output devices
+
+Keyboard with keyboard in memory
+- @KBD (RAM[24576])
+
+Screen with screen memory map
+- @SCREEN (RAM[16384]) base address of map
+
+I/O programming example:
+See Rectangle.asm
+
+Check to see which key is pressed
+If register = 0, no key is pressed.
+Use inifinite loop to check if a key is being pressed
+
+#### Compilation
+
+A compiler allows you to use an abstraction of code
+which is then converted to machine level language
+
+#### Project
+
+Mult.asm => Create a program that performs R2 = R0 * R1
