@@ -1087,3 +1087,161 @@ which is then converted to machine level language
 #### Project
 
 Mult.asm => Create a program that performs R2 = R0 * R1
+
+## Week 5 - Computer Architecture
+
+CPU of HACK compiuter will be made of Two elements, The ALU
+and a handful of registers.
+
+There is three types of information that passes thorughout the system.
+
+The data -> The numbers being manipulated etc.
+Addresses -> Which piece of data are we manipulating.
+Control -> what to do where and when.
+
+You have a number of buses.
+- Data bus
+- Control bus
+- Address bus
+
+The ALU
+- Needs to accept data and send outwards.
+- Control bus, to allow control what it needs to do.
+
+The Registers
+- Needs to be able to accept data.
+- Sometimes needs to specify addresses.
+- Lets the system know where a piece of data should be saved.
+
+The Memory
+- Stores the running programs and the data.
+- Address bus specific what needs to be written to and read from.
+- Program, needs to accept and address, and may give the data that is required.
+- Program needs to be connected to control bus, to tell system that needs to be done.
+
+### The Fetch Execute cycle
+
+A computer fetches one instruction after the other, executing each one in turn.
+
+Fetching
+- Put the location of the next instruciton into the address of the program memeory,
+- Get the instruction code itself by reading the memory contents at that location
+- Normally the address of the instruction to execute is kept in a program counter.
+
+The program counter, will normally be
+- the old value, plus one, or, 
+- A jump achieved by loading another value
+
+Executing
+- The instruction code specfies "what to do"
+  - Which arithmetic or logical instruction
+  - What memory to access
+  - if / where to jump
+
+- Often different subsets of the bits control different aspects
+of the operation.
+- Executing the operation involves also accessing registers and / or data memory.
+
+Simpler Solution: Harvard Architecture
+- Variant of von Neumann architecture
+- Keep program and Data in two separate memory modules
+- Complication avoided
+
+Hack Central Processing Unit
+- The centre-piece of every computing architecture
+- The hub of computation and the seat of control.
+- Which instruction should be fetched and executed.
+- Given a 16-bit processor, designed to:
+  - Execute the current instruction
+  - Figure out which instruction to execute next
+  (Machine language written in HACK machine language)
+
+#### HACK CPU interface
+IN
+- inM 16, from data memory
+- instruction 16, from Instruction memory
+- reset 1, from the user
+OUT
+Next three go to Data memory
+- outM 16 - Data value
+- writeM 1 - Write to memory?
+- addressM 15 - where to write
+This goes to instruction memory
+- pc 15 - Address of next instruction
+
+#### Hack CPU implementation - see picture
+contains the foolowing
+Mux16
+A Register
+PC
+Mux16
+D Register
+ALU
+c = control bits
+
+##### Instruction handing
+contains Mux16, A register
+- Receives A-Instruction (MSB is 0)
+  - Decode into op-code + 15-bit value
+  - Stores the value in the A-register
+  - Outputs the value
+
+- Receives C-instruction (MSB is 1)
+  - Decoded into following
+    - Op-code
+    - ALU control bits
+    - Destination load bits
+    - Jump Bits
+
+- Can receive from instruction, or
+- from ALU output
+
+ALU data inputs:
+- From the D-register
+- From the A-register / M-register
+- 6 Control bits from instruction
+
+Result of ALU, fed simultaneously to:
+- D-register (routed internally)
+- A-register (routed internally)
+- M-register (output)
+
+Which register received the output of the ALU
+is determined by the instructions destination bits
+
+ALU also outputs control bits
+this controls the control logic of the CPU.
+
+There is a reset button, if someone pushes the reset button,
+The computer will start running the current program, if you decide to
+reset the program, the computer will restart.
+
+The PC received input from the A-register a load bit.
+
+Program Counter Abstraction
+- Emits the address of the next instruction
+- To start / restart the programs execution: PC=0
+- no jump: PC++
+- goto: PC = A
+- conditional goto: if the condition is true PC = A else PC++
+
+PC logic
+if (reset === 1) PC = 0
+else
+  // current instruction
+  load = f(jump bits, ALU control outputs)
+  if (load==1) PC=A
+  else PC++
+
+PC output
+The address of the next instruction
+
+### - The Hack Computer
+
+Abstraction:
+A computer capable of running programs in the
+hack machine language.
+
+Implementation:
+Built from the Hack chip-set
+
