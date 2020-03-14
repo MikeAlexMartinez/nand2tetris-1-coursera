@@ -5,8 +5,8 @@
 
 /**
  * Demultiplexor:
- * {a, b} = {in, 0} if sel == 0
- *          {0, in} if sel == 1
+ * {a, b} = {in, 0} if sel == 0, a if 0
+ *          {0, in} if sel == 1, b if 1
  */
 
 CHIP DMux {

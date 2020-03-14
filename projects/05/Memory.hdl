@@ -27,5 +27,13 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    // selection bits = address[0..1]:
+    // 00 & 01 = 16K
+    // 10 = Screen
+    // 11 = Keyboard
+    Dmux4Way(in=load, sel=address[13..14], a=loadRamA, b=loadRamB, c=loadScreen, d=loadKey);
+    Or(a=loadRamA, b=loadRamB, out=or16k);
+    RAM16K(in=in, load=or16k, address=address[0..13] out=outRam);
+    Screen(in=in, load=loadScreen, address=[0..12], out=outScreen);
+    Keyboard(out)
 }
