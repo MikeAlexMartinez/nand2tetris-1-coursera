@@ -872,7 +872,7 @@ j3
 #### Jump Mapping
 
 | dest | j1 | j2 | j3 | effect |
-| null | 0 |  0 |  0 |  jump |
+| null | 0 |  0 |  0 |  no jump |
 | JGT  | 0 |  0 |  1 |  if out > 0 |
 | JEQ  | 0 |  1 |  0 |  if out = 0 |
 | JGE  | 0 |  1 |  1 |  if out >= 0 |

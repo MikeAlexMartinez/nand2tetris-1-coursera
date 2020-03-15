@@ -38,6 +38,42 @@ CHIP CPU {
         addressM[15],    // Address in data memory (of M)
         pc[15];          // address of next instruction
 
+    // C Instruction components:
+    // 15 - i
+    // 14 - x
+    // 13 - x
+    // 12 - a - 0 = A, 1 = M for ALU
+    // 11 - c1 ALU bits
+    // 10 - c2
+    // 9  - c3
+    // 8  - c4
+    // 7  - c5
+    // 6  - c6
+    // 5  - d1 - 1 = save in A
+    // 4  - d2 - 1 = save in D
+    // 3  - d3 - 1 = save in M
+    // 2  - j1 - jump bits
+    // 1  - j2 
+    // 0  - j3
     PARTS:
     // Put your code here:
+    // if a instruction load instruction into A resister
+    Mux16(a=instruction, b=aluOut, sel=instruction[15], out=muxToAReg);
+    // ARegister
+    // convert a instruction 0 to save into ARegister
+    Not(in=instruction[15], out=loadA);
+    Or(a=loadA, b=instruction[5], out=saveA);
+    ARegister(in=muxToAReg, load=saveA, out=aRegister);
+
+    // selects ARegister or inM to pass to ALU
+    Mux16(a=aRegister, b=inM, sel=instruction[12], out=muxToALU);
+
+    // selects whether to save aluOutput in DRegister or not
+    DRegister(in=aluOut, load=instruction[4], out=dRegister);
+
+    ALU(x=dRegister, y=muxToALU, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=aluOut, zr=aluZr, ng=aluNg);
+
+    // should the output be saved in M memory
+    And(a=instruction[15], b=instruction[3], out=writeM);
+
 }
