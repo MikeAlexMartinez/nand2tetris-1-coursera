@@ -872,7 +872,7 @@ j3
 #### Jump Mapping
 
 | dest | j1 | j2 | j3 | effect |
-| null | 0 |  0 |  0 |  no jump |
+| null | 0 |  0 |  0 |  No jump |
 | JGT  | 0 |  0 |  1 |  if out > 0 |
 | JEQ  | 0 |  1 |  0 |  if out = 0 |
 | JGE  | 0 |  1 |  1 |  if out >= 0 |
@@ -880,6 +880,10 @@ j3
 | JNE  | 1 |  0 |  1 |  if out != 0 |
 | JLE  | 1 |  1 |  0 |  if out <= 0 |
 | JMP  | 1 |  1 |  1 |  unconditional |
+
+j1 = less than zero
+j2 = equals zero
+j3 = greater than zero
 
 ### Hack Program
 

@@ -52,28 +52,58 @@ CHIP CPU {
     // 5  - d1 - 1 = save in A
     // 4  - d2 - 1 = save in D
     // 3  - d3 - 1 = save in M
-    // 2  - j1 - jump bits
-    // 1  - j2 
-    // 0  - j3
+    // 2  - j1 - jump bits = jump if less than zero
+    // 1  - j2 = jump if zero
+    // 0  - j3 = jump if greater than zero
     PARTS:
-    // Put your code here:
     // if a instruction load instruction into A resister
     Mux16(a=instruction, b=aluOut, sel=instruction[15], out=muxToAReg);
+
     // ARegister
     // convert a instruction 0 to save into ARegister
     Not(in=instruction[15], out=loadA);
     Or(a=loadA, b=instruction[5], out=saveA);
-    ARegister(in=muxToAReg, load=saveA, out=aRegister);
+    ARegister(in=muxToAReg, load=saveA, out=aRegister, out[0..14]=addressM);
 
     // selects ARegister or inM to pass to ALU
     Mux16(a=aRegister, b=inM, sel=instruction[12], out=muxToALU);
 
     // selects whether to save aluOutput in DRegister or not
-    DRegister(in=aluOut, load=instruction[4], out=dRegister);
+    // C instruction AND d2
+    And(a=instruction[15], b=instruction[4], out=saveD);
+    DRegister(in=aluOut, load=saveD, out=dRegister);
 
-    ALU(x=dRegister, y=muxToALU, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=aluOut, zr=aluZr, ng=aluNg);
+    ALU(x=dRegister, y=muxToALU, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=aluOut, out=outM, zr=aluZr, ng=aluNg);
 
     // should the output be saved in M memory
+    // C instruction AND d3
     And(a=instruction[15], b=instruction[3], out=writeM);
 
+    // Program Counter - Which instruction to fetch next
+
+    // ALU control bits:
+    // aluZr - was output of ALU 0
+    // aluNg - was output of ALU negative
+
+    // should load (i.e. jump) if:
+    // aluZr & j2 OR
+    // aluNg & j1 OR
+    // j3 & not(aluZr) & not(aluNg) AND
+    // a C instruction
+    And(a=aluZr, b=instruction[1], out=jumpZr);
+    And(a=aluNg, b=instruction[2], out=jumpLt);
+    Not(in=aluNg, out=notNg);
+    Not(in=aluZr, out=notZr);
+    And(a=notNg, b=notZr, out=aluGt);
+    And(a=aluGt, b=instruction[0], out=jumpGt);
+    Or(a=jumpZr, b=jumpLt, out=ltOrZr);
+    Or(a=ltOrZr, b=jumpGt, out=shouldJmp);
+    And(a=shouldJmp, b=instruction[15], out=load);
+
+    // should inc if:
+    // not(reset) & not(load)
+    Not(in=load, out=notLoad);
+    Not(in=reset, out=notReset);
+    And(a=notReset, b=notLoad, out=inc);
+    PC(in=aRegister, load=load, inc=inc, reset=reset, out[0..14]=pc);
 }
