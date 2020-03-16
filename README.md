@@ -1249,3 +1249,46 @@ hack machine language.
 Implementation:
 Built from the Hack chip-set
 
+## Week Six - Assembler
+
+### Section One
+
+Assmebler translates symbolic machine language to binary machine language.
+
+First software layer above the hardware.
+
+Assumes you have a 2nd computer that can produce code for another computer.
+
+e.g. my computer for the hack computer.
+
+#### Basic Assembler Logic
+
+Repeat:
+1. Read Next Assembly language command
+2. Break into the different fields it is composed of
+3. Lookup the binary code for each field
+4. Combine these codes into a single language command
+5. Output this machine language command
+Until end-of-file reached
+
+In detail
+1. Ignore whitespace or non-relevant commands
+2. Split into different parts, (spaces, symbols etc)
+3. Use lookups to translate parts into opcodes
+4. Need to be wary of incomplete binary strings that require padding
+5. write into file.
+
+#### Handling Symbols
+
+Used for Labels, and variables
+
+Needs to maintain a symbols table and then add symbols
+
+Forward References need to be considered.
+
+Possible Solutions,
+- leave blank until label appears, then fix
+- in first pass figure out labels then do second pass.
+
+### The HACK Assembly Language - A Translators Perspective
+
