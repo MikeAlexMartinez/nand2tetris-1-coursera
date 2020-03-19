@@ -1292,3 +1292,264 @@ Possible Solutions,
 
 ### The HACK Assembly Language - A Translators Perspective
 
+This is a translation challenge, YOu need to understand the rules
+of each langauge so that you can parse from one to the other.
+
+Need to identify A instructions and C instructions
+
+And to handle symbols.
+- predefined symbols
+- and user defined symbols
+
+Assembly program elements:
+- White space
+  - empty lines / indentation
+  - line comments
+  - inline comments
+
+- Instructions
+  - A-instructions
+  - C-instructions
+
+- Symbols
+  - References
+  - Label declarations
+
+#### Plan Ahead
+1. DEvelop a basic assembler that translates symbol-less Hack Programs
+2. Develop an ability to handle symbols
+3. Morph basic assembler into an assembler that translates any Hack program
+
+### Handling Instructions
+
+#### A Instructions
+@value = @21
+Where value is either
+- a non-negative decimal constant or
+- a symbol referring to such a constant
+@valueInbinary = 0 000000000010101
+
+Task: If value is a decimal constant, generate the equivalent 15-bit binary constant
+
+#### C Instruction
+Symbolic syntax: dest = comp; jump
+Binary syntax:   1 1 1 a c1 c2 c3 c4 c5 c6 d1 d2 d3 j1 j2 j3
+
+Comparison Table
+| comp ||       c1 | c2 | c3 | c4 | c5 | c6 |
+| 0    |      | 1  | 0  | 1  | 0  | 1  | 0  |
+| 1    |      | 1  | 1  | 1  | 1  | 1  | 1  |
+| -1   |      | 1  | 1  | 1  | 0  | 1  | 0  |
+| D    |      | 0  | 0  | 1  | 1  | 0  | 0  |
+| A    | M    | 1  | 1  | 0  | 0  | 0  | 0  |
+| !D   |      | 0  | 0  | 1  | 1  | 0  | 1  |
+| !A   | !M   | 1  | 1  | 0  | 0  | 0  | 1  |
+| -D   |      | 0  | 0  | 1  | 1  | 1  | 1  |
+| -A   | -M   | 1  | 1  | 0  | 0  | 1  | 1  |
+| D+1  |      | 0  | 1  | 1  | 1  | 1  | 1  |
+| A+1  | M+1  | 1  | 1  | 0  | 1  | 1  | 1  |
+| D-1  |      | 0  | 0  | 1  | 1  | 1  | 0  |
+| A-1  | M-1  | 1  | 1  | 0  | 0  | 1  | 0  |
+| D+A  | D+M  | 0  | 0  | 0  | 0  | 1  | 0  |
+| D-A  | D-M  | 0  | 1  | 0  | 0  | 1  | 1  |
+| A-D  | M-D  | 0  | 0  | 0  | 1  | 1  | 1  |
+| D&A  | D&M  | 0  | 0  | 0  | 0  | 0  | 0  |
+| DorA | DorM | 0  | 1  | 0  | 1  | 0  | 1  |
+| a=0  | a=1  |
+
+Jump bits
+| dest | j1 | j2 | j3 | effect |
+| null | 0 |  0 |  0 |  No jump |
+| JGT  | 0 |  0 |  1 |  if out > 0 |
+| JEQ  | 0 |  1 |  0 |  if out = 0 |
+| JGE  | 0 |  1 |  1 |  if out >= 0 |
+| JLT  | 1 |  0 |  0 |  if out < 0 |
+| JNE  | 1 |  0 |  1 |  if out != 0 |
+| JLE  | 1 |  1 |  0 |  if out <= 0 |
+| JMP  | 1 |  1 |  1 |  unconditional |
+
+j1 = less than zero
+j2 = equals zero
+j3 = greater than zero
+
+16 - i
+15 - x
+14 - x
+13 - a - 0 = A, 1 = M for ALU
+12 - c1 ALU bits (see comparison table)
+11 - c2
+10 - c3
+9  - c4
+8  - c5
+7  - c6
+6  - d1 - 1 = save in A
+5  - d2 - 1 = save in D
+4  - d3 - 1 = save in M
+3  - j1 - jump bits = jump if less than zero
+2  - j2 = jump if zero
+1  - j3 = jump if greater than zero
+
+a deter
+
+Example: MD=D+1
+
+1 - 16 - i
+1 - 15 - x
+1 - 14 - x
+0 - 13 - a - 0 = A, 1 = M for ALU
+0 - 12 - c1 ALU bits (see comparison table)
+1 - 11 - c2
+1 - 10 - c3
+1 - 9  - c4
+1 - 8  - c5
+1 - 7  - c6
+0 - 6  - d1 - 1 = save in A
+1 - 5  - d2 - 1 = save in D
+1 - 4  - d3 - 1 = save in M
+0 - 3  - j1 - jump bits = jump if less than zero
+0 - 2  - j2 = jump if zero
+0 - 1  - j3 = jump if greater than zero
+
+Example: MD=A-1;JGE
+
+1 - 16 - i
+1 - 15 - x
+1 - 14 - x
+0 - 13 - a - 0 = A, 1 = M for ALU
+1 - 12 - c1 ALU bits (see comparison table)
+1 - 11 - c2
+0 - 10 - c3
+0 - 9  - c4
+1 - 8  - c5
+0 - 7  - c6
+0 - 6  - d1 - 1 = save in A
+1 - 5  - d2 - 1 = save in D
+1 - 4  - d3 - 1 = save in M
+0 - 3  - j1 - jump bits = jump if less than zero
+1 - 2  - j2 = jump if zero
+1 - 1  - j3 = jump if greater than zero
+
+For Each Instruction
+- Parse the instruction: break it into it's underlying fields
+- A-Instruction: translate the decimal value into a binary value
+- C-Instruction: for each field in the instruction, generate the
+  corresponding binary code;
+  Assemble the translated binary codes into a complete 16-bit instruction
+- Write the 16-bit instruction to the output file
+
+### Handling Symbols
+
+Takes a base memory address. For each symbol encountered
+the symbol is assigned a memory address that increments by one,
+each time a new symbol is encountered.
+
+As you can encounter a symbol before it's declared you need to process
+in two passes.
+
+3 Types of Symbols in Hack:
+- Variable Symbols: represent memory locations
+- Label Symbols: represents destination in a goto / jump instruction
+- pre-defined symbols: represent special memory locations
+
+Predefined Symbols:
+
+#### Built In Symbols
+!!! Hack is case-sensitive !!!
+
+Hack assembly language has builtin symbols
+R0 = 0
+R1 = 1
+R2 = 2
+... ...
+R15=15
+
+SCREEN = 16384
+KDB = 24576
+
+SP = 0
+LCL = 1
+ARG = 2
+THIS = 3
+THAT = 4
+
+#### Label Symbols
+- Declared by a pseudo command (xxx)
+
+These don't generate an instruction.
+important to note the memory location of the following instruction
+
+The base location in memory of the hack computer
+is 16.
+
+#### Symbol table
+
+Add predefined symbols to the table at start up.
+
+2 methods:
+- 1st pass, define symbols
+- 2nd pass, add variables
+
+#### The Assembly Process
+
+Initialization:
+- Construct an empty symbol table
+- Add the pre-defined symbols to the symbol table
+
+First Pass:
+Scan the entire program;
+For each instruction of the form (xxx):
+- Add the (xxx, address) to the symbol table where address is
+  the number of the instruction following (xxx)
+
+Second Pass:
+- set n to 16
+  Scan entire program againl for each instruction:
+  - if the instruction is @symbol, look up the symbol in the symbol table;
+    - if (symbol, value) is found, use value to complete the instruction's translation;
+    - if not found:
+      - Add (symbol, n) to the symbol table,
+      - Use n to complete the instruction\s translation,
+      - n++
+  - If the instruction is a C-instruction, complete the instruction's translation
+  - Write the translated instruction to the output file.
+
+#### Developing the Hack Assembler
+
+#### Proposed Software Architecture
+
+Sub Tasks:
+1. Reading and Parsing Commands
+2. Converting Mnemonics -> Code
+3. Handling Symbols
+
+
+No need to understand the meaning of anything. Just parses tgem
+
+- Start reading a file,
+  - e.g. constructor for a Parser object that accepts a string specifying a file name.
+  - Need to know how to read files
+
+- Move to next command,
+  - Are we finished?
+  - Get the next command
+  - Need to read on line at a time
+  - Need to skip whitespace including comments
+
+- Get the fields of the current command
+  - Type of current command (A, C, or label)
+  - Easy access to the fields: D = M+1; JGT or @sum
+
+- Then you translate the elements
+
+and construct the relevant bits
+
+- The symbol Table
+  Doesn't need to know what the symbols mean.
+  Just needs to know symbol => memory address.
+  - Create a new empty table
+  - Add a (symbol, address) pair to the table
+  - Does the table contain a given symbol?
+  - What is the address associated with a given symbol?
+
+
+  
