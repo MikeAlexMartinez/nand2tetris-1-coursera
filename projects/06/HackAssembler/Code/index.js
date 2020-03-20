@@ -1,4 +1,4 @@
-const MAX = Math.pow(2, 15);
+const { numToBinary } = require('../Utils');
 
 const computeMap = {
   '0': '0101010',
@@ -64,14 +64,6 @@ function constructCInstruction(parsedInstruction) {
   const destBits = getDestBits(dest);
   const jumpBits = getJumpBits(jump);
   return `111${computeBits}${destBits}${jumpBits}`;
-}
-
-function numToBinary(address) {
-  let num = Number(address);
-  let start = MAX;
-  // get start point
-
-  // get 
 }
 
 function constructAInstruction(parsedInstruction) {

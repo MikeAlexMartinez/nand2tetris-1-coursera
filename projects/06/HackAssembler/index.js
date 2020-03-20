@@ -1,7 +1,5 @@
 const main = require('./Main')
 
-
-
 function hackAssembler() {
   const args = process.argv;
   (async (args) => {
