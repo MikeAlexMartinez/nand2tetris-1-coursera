@@ -1550,6 +1550,51 @@ and construct the relevant bits
   - Add a (symbol, address) pair to the table
   - Does the table contain a given symbol?
   - What is the address associated with a given symbol?
+  - While reading the input, add labels and new variables to the table
+    - labels: When you see a "(xxx)" command add 'xxx' and the address
+      of the next machine language command
+      - requires maintaining the running address
+      - may need to be done in a first pass
+    - Variables: When you see an "@xxx" command, where "xxx" is not a
+      number and not already in the table, add "xxx" and the next free
+      address for variable allocation.
 
+#### Project 6
 
-  
+Contract
+- Develop a HackAssembler program that translates Hack assembly programs 
+into executable Hack binary code
+- The source program is supplied in a text file named Xxx.asm
+- The generated code is written into a text file named Xxx.hack
+- Assumption: Xxx.asm is error-free (phew)
+
+Usage:
+```bash
+> node HackAssembler Xxx.asm
+```
+
+This command should create (or override) an Xxx.hack file that can be 
+executed as-is on the Hack Computer.
+
+If the file already exists, it overwrites the target file.
+
+Can be written in any high-level language
+
+Proposed Software Architecture:
+- Parser: unpacks each instruction into its underlying fields
+- Code: translates each field into its corresponding binary value
+- SymbolTable: manages the symbol table
+- Main: Initializes the I/O files and drives the process.
+
+Stage Development
+- DEvelop a basic assembler that translates assemby programs without symbols
+- Develop an ability to handle symbols
+- Morph the basic assembler into an assembler that can translate any assembly program
+
+Supplied test Programs:
+1. Add.asm
+2. Max.asm MaxL.asm
+3. Rectangle.asm RectangleL.asm
+4. Pong.asm PongL.asm
+
+L programs don't have symbols
