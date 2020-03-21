@@ -3,6 +3,7 @@ function compose(...chain) {
 }
 
 const trim = (str) => str.replace(/\s/g, '')
+
 const removeComments = (str) => str.split('//')[0]
 
 const clean = compose(trim, removeComments);
@@ -95,6 +96,5 @@ function parser(codeAssembler, symbolTable) {
 
   return fileParser;
 }
-
 
 module.exports = parser;
