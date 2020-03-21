@@ -51,9 +51,9 @@ function getJumpBits(key) {
 }
 
 function getDestBits(key) {
-  const a = key.test(/A/) ? '1' : '0';
-  const d = key.test(/D/) ? '1' : '0';
-  const m = key.test(/M/) ? '1' : '0';
+  const a = /A/.test(key) ? '1' : '0';
+  const d = /D/.test(key) ? '1' : '0';
+  const m = /M/.test(key) ? '1' : '0';
 
   return a + d + m;
 }
