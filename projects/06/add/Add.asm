@@ -7,7 +7,7 @@
 
 @2
 D=A
-@3
+@3 // This is another comment
 D=D+A
 @0
 M=D
