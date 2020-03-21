@@ -32,5 +32,8 @@ describe('numToBinary()', () => {
       const number = `${MAX_NUMBER+1}`;
       expect(numToBinary(number)).toEqual('000000000000000');
     });
+    it('should convert 16384 correctly', () => {
+      expect(numToBinary(16384)).toEqual('100000000000000');
+    });
   })
 });

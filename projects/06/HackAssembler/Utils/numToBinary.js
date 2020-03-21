@@ -24,7 +24,7 @@ function truncateExtraBits(binString) {
 }
 
 function setBitLength(binString) {
-  return binString.length <= MAX_LENGTH
+  return binString.length < MAX_LENGTH
     ? addPaddingBits(binString)
     : truncateExtraBits(binString);
 }
