@@ -2,12 +2,13 @@ const path = require('path');
 const fs = require('fs');
 const parser = require('../Parser');
 const binaryWriter = require('../Code')
+const symbolTable = require('../SymbolTable')
 
 async function main(file) {
   const filePath = path.resolve(file);
   const targetPath = filePath.replace(/\.asm$/, '.hack');
   const asmFile = await readFile(filePath);
-  const fileParser = parser(binaryWriter);
+  const fileParser = parser(binaryWriter, symbolTable());
   const hackFile = fileParser(asmFile);
   await writefile(hackFile, targetPath);
 }
