@@ -73,9 +73,10 @@ function constructAInstruction(parsedInstruction) {
 
 function binaryWriter(parsedInstruction) {
   const { type } = parsedInstruction
-  return type === 'A'
+  const binaryInstruction = type === 'A'
     ? constructAInstruction(parsedInstruction)
     : constructCInstruction(parsedInstruction)
+  return `${binaryInstruction}\n`
 }
 
 module.exports = binaryWriter

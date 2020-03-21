@@ -15,7 +15,13 @@ const setInstructionType = ({ source, ...rest }) => ({
 
 const parseCInstruction = (row) => {
   const [destAndCompute, jump] = row.split(';');
-  const [dest, compute] = destAndCompute.split('=');
+  let [destOrCompute, compute] = destAndCompute.split('=');
+  if (!compute) {
+    compute = destOrCompute;
+    dest = '';
+  } else {
+    dest = destOrCompute;
+  }
   return {
     compute,
     dest,

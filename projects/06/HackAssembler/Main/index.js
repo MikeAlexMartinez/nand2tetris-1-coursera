@@ -27,7 +27,7 @@ async function readFile(filePath) {
 // write file
 async function writefile(hackFile, target) {
   try {
-    await fs.writeFileSync(target, hackFile.join('\n'), { encoding: 'utf8' });
+    await fs.writeFileSync(target, hackFile.join(''), { encoding: 'utf8' });
   } catch (e) {
     console.log('error reading file');
     console.error(e);
