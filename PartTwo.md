@@ -234,7 +234,7 @@ addr = LCL+2
 SP--
 \*addr = \*SP
 
-Hack Assembly:
+Hack Assembly: (My attempt)
 @2
 D = A // D = 2
 @LCL
@@ -353,6 +353,151 @@ being handled in week 8. So are missing the 'function / return envelope'
 
 #### The VM Implementation on the HACK Platform
 
+VM Code:
+push constant 2 =>
+
+Hack Assembly Code:
+@2 // Set A-register to 2
+D=A // move A-register value of 2 to D-register
+@SP // select stack in memory
+A=M // set Memory location to current position of stack
+M=D // set selected memory location to value in D (2)
+@SP // select stack in memory
+M=M+1 // increment stack position by 1
+
+In Order to write a VM translator, we must be familiar with:
+- The source language
+- The target language
+- The VM Mapping on the target platform
+
+##### Source: VM Language
+
+Arithmetic / Logical commands:
+- add
+- sub
+- neg
+- eq
+- gt
+- lt
+- and
+- or
+- not
+
+Memory Access commands
+- pop segment i
+- push segment i
+
+Branching commands
+- label label
+- goto label
+- if-goto label
+
+Function commands
+- function functionName nVars
+- call functionName nArgs
+- return
+
+Target: Symbolic Hack Code (See PartOne.md)
+
+Standard VM mapping on the Hack Platform
+
+VM mapping decisions:
+- How to map the VM's data structures using the host hardware platform
+- How to express the VM's commands using the host machine language
+
+Standard Mapping:
+- Specifies how to do the mapping in an agreed-upon way
+- Benefits:
+  - Compatibility with other software systems
+  - Standard testing
+
+HACK RAM
+0         SP
+1         LCL
+2         ARG
+3         THIS
+4         THAT
+5..12     temp segment
+13..15    general
+16..255   static variables
+256..2047 stack
+
+_local, argument, this, that:_ Allocated dynamically to the RAM. The base address
+of these allocations are kept in the semgent pointers LCL, ARG, THIS, THAT
+
+accessing segment i should result in accessing RAM[*segmentPointer + i]
+
+_constant:_ accessing constant i should result in supplying the constant i
+
+_static_: accessing static i within file Foo.vm should result in accessing the assembly variable Foo.i
+
+_temp_: fixed segment mapped on to RAM addresses 5-12
+
+_pointer_: fixed segment mapped on RAM addresses 3-4. pointer 0 = THIS, pointer 1 = THAT
+
+Symbols of the form Xxx.i will be assigned to RAM by the Hack Assembler as defined.
+
 #### The VM Translator: Proposed Solution
 
+Proposed Design:
+- Parser: parses each VM command into its lexical elements
+- CodeWriter: writes the assembly code that implements the parsed command
+- Main: drives the process (VMTranslator)
+
+Main(VMTranslator)
+Input: fileName.vm
+Output: fileName.asm
+
+Main Logic:
+- Constructs a Parser to handle the input file
+- Constructs a CodeWriter to handle the output file
+- Marches through the input file, parsing each line and generating code from it
+
+Parser:
+- Handles the parsing of a single .vm file
+- Reads a VM command, parses the command into its lexical components, and provides convenient
+  access to these components.
+- Ignores all white space and comments
+
+Routines
+Constructor
+hasMoreCommands
+advance
+commandType returns one of
+- C_ARITHMETIC  - In project 7
+- C_PUSH - In project 7
+- C_POP - In project 7
+- C_LABEL - Project 8
+- C_GOTO - Project 8
+- C_IF - Project 8
+- C_FUNCTION - Project 8
+- C_RETURNS - Project 8
+- C_CALL - Project 8
+arg1 - returns 2nd arg
+arg2 - returns 3rd arg
+
+CodeWriter:
+- Generates assmebly code from the parsed VM command:
+
+Routines
+- Constructor
+- writeArithmetic command (string)
+- writePushPop command (C_PUSH or C_POP), segment (string), index (int)
+- Close
+
 #### Project 7: Building the VM Translator: Part One
+
+5 Test Programs.
+
+Most important one is the .vm file
+
+- Write a VM to Hack translator that conforms to the standard defined.
+- Generated .asm files should match compare file.
+
+Recommended steps:
+
+Play with program in VM Emulator. (using VME.tst file)
+
+Some Testing Challenges: It's missing function return envelope, therefore,
+the test script must be used to plug these holes manually.
+

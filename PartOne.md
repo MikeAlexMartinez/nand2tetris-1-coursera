@@ -1357,6 +1357,8 @@ Comparison Table
 | DorA | DorM | 0  | 1  | 0  | 1  | 0  | 1  |
 | a=0  | a=1  |
 
+*Or is normally a | character
+
 Jump bits
 | dest | j1 | j2 | j3 | effect |
 | null | 0 |  0 |  0 |  No jump |
