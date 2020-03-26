@@ -24,6 +24,57 @@ function labelGenerator() {
 
 const getLabels = labelGenerator();
 
+function memorySegmentMap(memory) {
+  const map = {
+    local: 'LCL',
+    argument: 'ARG',
+    this: 'THIS',
+    that: 'THAT',
+  }
+  return map[memory];
+}
+
+function getBase(memory, index) {
+  switch (memory) {
+    case 'static':
+      return 16;
+    case 'temp':
+      return 5;
+    case 'pointer':
+      return index ? 'THAT' : 'THIS';
+    default:
+      return memorySegmentMap(memory);
+  }
+}
+
+function genericPush() {
+  return [
+    'D=M', // store value from address in D
+    '@SP', // get stack pointer
+    'A=M', // store address from pointer in A-register
+    'M=D', // set value from D at top of stack
+    '@SP', 
+    'M=M+1', // move stack pointer up by 1
+  ];
+}
+
+function pushWithStatic(address) {
+  return [
+    `@${address}`, // create memory offset value
+    ...genericPush(),
+  ];
+}
+
+function pushWithPointer(base, index) {
+  return [
+    `@${index}`, // create memory offset value
+    'D=A', // store in D-register
+    `@${base}`, // select base of memory segment
+    'A=D+M', // set Address to base + offset
+    ...genericPush(),
+  ];
+}
+
 function pushConstant(index) {
   return [
     `@${index}`,
@@ -36,19 +87,71 @@ function pushConstant(index) {
   ]
 }
 
-function writhPushOp(memory, index, source) {
+function writePushOp(memory, index, source) {
+  const base = getBase(memory, index);
   switch (memory) {
+    // constant is push only
     case 'constant':
       return [`// ${source}`, ...pushConstant(index)];
+    case 'argument':
+    case 'local':
+    case 'this':
+    case 'that':
+      return [`// ${source}`, ...pushWithPointer(base, index)]
+    case 'static':
+    case 'temp': {
+      const address = Number(base) + Number(index);
+      return [`// ${source}`, ...pushWithStatic(address)];
+    }
+    case 'pointer':
+      return [`// ${source}`, ...pushWithPointer(base, 0)]
     default:
       throw Error(`memory segment is invalid: ${memory}`)
   }
 }
 
+function popWithStatic(address) {
+  return [
+    '@SP',
+    'AM=M-1',
+    'D=M',
+    `@${address}`,
+    'M=D',
+  ];
+}
+
+function popWithPointer(base, index) {
+  return [
+    `@${index}`,
+    'D=A',
+    `@${base}`,
+    'D=D+M',
+    '@R13',
+    'M=D',
+    '@SP',
+    'AM=M-1',
+    'D=M',
+    '@R13',
+    'A=M',
+    'M=D',
+  ];
+}
+
+function writePopOp(memory, index, source) {
+  const base = getBase(memory, index);
+  if (memory === 'pointer') {
+    return [`// ${source}`, ...popWithPointer(base, 0)];
+  } else if (memory === 'static' || memory === 'temp') {
+    const address = Number(base) + Number(index);
+    return [`// ${source}`, ...popWithStatic(address, 0)];
+  }
+  return [`// ${source}`, ...popWithPointer(base, index)];
+}
+
 function writePushPopOps(commandType, memory, index, source) {
   return commandType === C_PUSH
-    ? writhPushOp(memory, index, source)
-    : writePushPopOps(memory, index, source);
+    ? writePushOp(memory, index, source)
+    : writePopOp(memory, index, source);
 }
 
 function operationMap(op) {
