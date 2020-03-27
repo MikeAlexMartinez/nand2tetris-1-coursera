@@ -164,6 +164,7 @@ function operationMap(op) {
     and: 'D&M',
     or: 'D|M',
     not: '!M',
+    neg: '-M',
   };
   return operations[op];
 }
@@ -188,23 +189,27 @@ function comparatorOp(op) {
   const { endAddress, endLabel } = getEnd()
   return [
     ...popTwo(),
-    'D=D-M',
+    'D=M-D',
     nextAddress, // next
     `D; ${operationMap(op)}`,
+    '@SP',
+    'A=M-1',
     'M=0', // return 0
     endAddress, // go to end
     '0; JMP', //unconditional jump
     nextLabel, // <= next
+    '@SP',
+    'A=M-1',
     'M=-1', //, return -1
     endLabel, //, end
   ];
 }
 
-function negOp() {
+function singleOp(op) {
   return [
     `@SP`,
     'A=M-1',
-    'M=-M',
+    `M=${operationMap(op)}`,
   ];
 }
 
@@ -221,10 +226,10 @@ function writeArithmeticOps(op) {
     case 'sub':
     case 'and':
     case 'or':
-    case 'not':
       return withOpComment(op, combinationOp);
+    case 'not':
     case 'neg':
-      return withOpComment(op, negOp);
+      return withOpComment(op, singleOp);
     case 'eq':
     case 'gt':
     case 'lt':
