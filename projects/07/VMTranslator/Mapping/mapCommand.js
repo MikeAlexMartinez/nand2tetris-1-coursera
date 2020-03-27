@@ -1,4 +1,4 @@
-const { C_PUSH, C_POP, C_ARITHMETIC } = require('../mapping/constants');
+const { C_PUSH, C_POP, C_ARITHMETIC } = require('./constants');
 
 const arithmeticCommands = [
   'add',
