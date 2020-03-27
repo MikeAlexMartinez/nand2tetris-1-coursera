@@ -41,7 +41,7 @@ function getBase(memory, index) {
     case 'temp':
       return 5;
     case 'pointer':
-      return index ? 'THAT' : 'THIS';
+      return ['THIS', 'THAT'][index];
     default:
       return memorySegmentMap(memory);
   }
@@ -104,13 +104,13 @@ function writePushOp(memory, index, source) {
       return [`// ${source}`, ...pushWithStatic(address)];
     }
     case 'pointer':
-      return [`// ${source}`, ...pushWithPointer(base, 0)]
+      return [`// ${source}`, ...pushWithStatic(base)]
     default:
       throw Error(`memory segment is invalid: ${memory}`)
   }
 }
 
-function popWithStatic(address) {
+function popWithStaticAddress(address) {
   return [
     '@SP',
     'AM=M-1',
@@ -120,7 +120,7 @@ function popWithStatic(address) {
   ];
 }
 
-function popWithPointer(base, index) {
+function popWithPointerAddress(base, index) {
   return [
     `@${index}`,
     'D=A',
@@ -140,12 +140,12 @@ function popWithPointer(base, index) {
 function writePopOp(memory, index, source) {
   const base = getBase(memory, index);
   if (memory === 'pointer') {
-    return [`// ${source}`, ...popWithPointer(base, 0)];
+    return [`// ${source}`, ...popWithStaticAddress(base)];
   } else if (memory === 'static' || memory === 'temp') {
     const address = Number(base) + Number(index);
-    return [`// ${source}`, ...popWithStatic(address, 0)];
+    return [`// ${source}`, ...popWithStaticAddress(address)];
   }
-  return [`// ${source}`, ...popWithPointer(base, index)];
+  return [`// ${source}`, ...popWithPointerAddress(base, index)];
 }
 
 function writePushPopOps(commandType, memory, index, source) {
