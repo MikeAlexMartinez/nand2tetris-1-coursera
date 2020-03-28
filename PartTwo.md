@@ -501,3 +501,40 @@ Play with program in VM Emulator. (using VME.tst file)
 Some Testing Challenges: It's missing function return envelope, therefore,
 the test script must be used to plug these holes manually.
 
+#### Perspectives
+
+JVM uses a register machine rather than the stack architecture
+used in this course. Apparently suitable for mobile devices.
+
+## Week 8 - Virtual Machine - Program Control
+
+Functions provide a means to abstract underlying functionality.
+
+It means a basic language can be extended at will.
+
+Branching Commands:
+- goto _label_
+- if-goto _label_
+- label _label_
+
+Function commands
+- call _function_
+- function _function_
+- return
+
+Challenges:
+- Understand the abstraction
+- Building the implementation
+
+To Learn:
+- Branching
+- Functions
+- Function call-and-return
+- Dynamic memory management
+- Stack processing
+- Pointers
+- Completing the VM implementation
+
+
+
+
