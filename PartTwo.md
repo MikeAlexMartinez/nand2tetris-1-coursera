@@ -535,6 +535,115 @@ To Learn:
 - Pointers
 - Completing the VM implementation
 
+### Branching
 
+You have two types of branching:
+- Unconditional Branching
+- Conditional Branching
+
+e.g.
+
+psuedo:
+if-goto ENDLOOP
+
+takes top value from stack, if true,
+go to named loop
+
+goto ENDLOOP, is unconditional
+
+Also need the:
+label _label_ command to give positions that the code can jump to.
+
+### Functions: Abstraction
+
+High-level programming languages can be extended using:
+- Subroutines
+- Functions
+- Procedures
+- Methods
+...
+
+High-level program:
+
+...
+sqrt(x - 17 + x * 5)
+...
+
+Becomes in VM:
+...
+push x
+push 17
+sub
+push x
+push 5
+call Math.multiply
+add
+call Math.sqrt
+
+The VM language features:
+- Primitive operations (fixed)
+- abstract operations (extensible): multiply, sqrt...
+
+Calling a function and a built in command has the same look and feel
+
+Defining:
+
+High Level program:
+int mult(int x, int y) {
+  int sum = 0;
+  int n = 1;
+  while !(n > y) {
+    sum += x;
+    n++;
+  }
+  return sum;
+}
+
+Final VM Code:
+
+function mult 2 // 2 local vars
+  push constant 0 // sum = 0
+  pop local 0
+  push constant 1 // n = 1
+  pop local 1
+label LOOP
+  push local 1 // if!(n>y) goto END
+  push argument 1
+  gt
+  if-goto END
+  push local 0 // sum += x
+  push argument 0
+  add
+  pop local 0
+  push local 1 // n++
+  push constant 1
+  add
+  pop local 1
+  goto LOOP
+label END
+  push local 0 // return sum
+  return
+
+Executing functions.
+  call mult 2 => calls mult function
+  and informs function that 2 arguments were placed
+  onto the stack
+
+The VM code knows to replace the number of arguments
+passed with the result from the function
+
+Implementation:
+
+For each function call during run-time, the implementation has to...
+- pass parameters from the calling function to the called function
+- Determine the return address within the caller's code;
+- Save the callers return address, stack and memory segments
+- Jump to execute the called function
+
+For each function _return_ during run-time, the implementation has to
+- Return to the caller the value computed by the called function;
+- Recycle the memory resources used by the called function;
+- Reinstate the caller's stack and memory segments;
+- Jump to the return address in the caller's code.
 
 
