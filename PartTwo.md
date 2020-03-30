@@ -646,4 +646,216 @@ For each function _return_ during run-time, the implementation has to
 - Reinstate the caller's stack and memory segments;
 - Jump to the return address in the caller's code.
 
+### Function Call and Return: Implementation Preview
+
+How to implement the VM commands, call, function and return.
+- A Computer program typically consists of many functions
+- During a given point of time, only a few functions are executing.
+- These active function create a calling chain.
+
+- Each function uses a working stack + memory segments
+- The working stack and some of the segments should be:
+  - created when the function starts running,
+  - maintained as long as the function is executing,
+  - Recycled when the function returns.
+
+The functions state - Calling pattern is LIFO (a stack)
+
+VM Implementation
+Call:
+1. Set args: Given `call foo nArgs` We can set the base address of the args stack to the current address of the `SP minus nArgs`
+2. Save the caller's frame:
+  Need to save the frame of the caller (return address, saved LCL, saved ARG, saved THIS, saved THAT)
+3. jump to foo
+Entered:
+1. Sets up the local segment of the called function.
+2. Push nVars variable onto the stack
+3. Carry out function
+4. return - Copy return value onto argument 0
+5. Restore segment pointers of the caller
+6. Clear the stack
+7. Sets the SP for the caller
+8. Jumps to the return address within the callers code
+
+The global stack will consist of many of these function blocks.
+
+Any sufficiently advanced technology is indistinguishable from magic:
+- Arthur C. Clarke
+
+Example: Factorial
+
+High-level:
+```java
+// Tests the factorial function
+int main() {
+  return factorial(3);
+}
+
+// Returns n!
+int factorial(int n) {
+  if (n==1)
+    return 1;
+  else
+    return n * factorial(n-1);
+}
+```
+
+Psuedo VM Code:
+```javascript
+function main
+  push 3
+  call factorial
+  return
+function factorial(n)
+  push n
+  push 1
+  eq
+  if-goto BASECASE
+  push n
+  push n
+  push 1
+  sub
+  call factorial
+  call mult
+  return
+
+label BASECASE
+  push 1
+  return
+
+function mult(a, b)
+  // code omitted...
+```
+
+VM Program:
+```javascript
+function main 0
+  push constant 3
+  call factorial 1
+  return
+function factorial 0
+  push argument 0
+  push constant 1
+  eq
+  if-goto BASECASE
+  push argument 0
+  push argument 0
+  push constant 1
+  sub
+  call factorial 1
+  call mult 2
+  return
+
+label BASECASE
+  push constant 1
+  return
+
+function mult 2
+  // code omitted...
+```
+
+### The Function Call and Return Implementation
+
+Vm code might be generated from multiple files, with each
+file or 'class' containing many methods / functions.
+
+VM Function Comands:
+- call functionName nArgs
+- function functionName nVars
+- return
+
+Contract: the calling functions view
+- Before calling another function, I must push as many arguments as the function expects to get
+- Next, I invoke the function using call functionName nArgs
+- After the called function returns, the argument values that I pushed before the call have disappeared from the stack, and the return value (that always exists) appears at the top of the stack;
+- After the called function returns, all my memory segments are exactly the same as they were before the call.
+
+Contract: The called function's view
+- Before I start executing, my argument segment has been initialized with the argument values passed by the caller
+- My local variables have been allocated and initialized to zeros
+- My static segment has been set to the static segment of the VM file to which I belong
+(memory segments this, that, pointer, and temp are undefined upon entry)
+- My working stack is empty
+- Before returning, I must push a value onto the stack.
+
+The VM Implementation View
+VM Code:
+```javascript
+function Foo.main 4
+  ...
+  // computes -(19 * (local 3))
+  push constant 19
+  push local 3
+  call Bar.mult 2
+  neg
+  ...
+function Bar.mult 2
+  // Returns the product of two
+  // arguments (result in local 1)
+  ...
+  push local 1
+  return
+```
+
+Becomes:
+(Foo.main)
+  // assembly code that handles setting up of a function's
+  // execution
+  ...
+  // assembly code that handles push constant 19
+  // assembly code that handles push local 3
+  // assembly code that saves the caller's state,
+  // sets up for the function call, and then:
+  goto Bar.mult // in assembly
+(Foo$ret.1)
+  // assembly code that handles neg
+  ...
+(Bar.mult)
+  // assembly code that handles the setting up of
+  // a function's execution
+  ...
+  // assembly code that handles push local 1
+  // assembly code that moves the return value to the
+  // caller, reinstates the caller's state, and then:
+  goto Foo$ret.1 // in assembly
+
+#### Handling Call
+
+VM command: call functionName nArgs
+
+Assembly Code:
+push returnAddress // Using the label declared below
+push LCL // saves the LCL of the caller
+push ARG
+push THIS
+push THAT
+ARG = SP-5-nArgs // Repositions Arg
+LCL = SP // Repositions LCL
+goto functionName // Transfers control to the called function
+(returnAddress) // Declares a label for the return address
+
+### Handling function
+
+VM command: function functionName nVars
+
+Assembly Code:
+(functionName)      // declares a label for the function entry
+repeat nVarsTimes:  // nVars = number of local variables
+  push 0            // initializes the local variables to 0
+
+### Handling return
+
+Assembly code:
+endFrame = LCL // endframe is a temporary variable
+retAddr = *(endFrame - 5) // gets the return address
+*ARG = pop()  // Repositions the return value for the caller
+SP = ARG+1    // Repositions SP of the caller
+THAT = *(endFrame - 1)  // Restores THAT of the caller
+THIS = *(endFrame - 2)  // Restores THIS of the caller
+ARG = *(endFrame - 3)  // Restores ARG of the caller
+LCL = *(endFrame - 4)  // Restores LCL of the caller
+goto retAddr  // goes to return address in the caller's code
+
+Once SP is repositioned, anything below it becomes recycled and can be uesd by
+memory
 
