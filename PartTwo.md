@@ -859,3 +859,93 @@ goto retAddr  // goes to return address in the caller's code
 Once SP is repositioned, anything below it becomes recycled and can be uesd by
 memory
 
+### VM Translator on the HACK platform
+
+Program compilation and translation. Begin with multiple Jack files
+which are converted into multiple .vm files. These are compiled into 
+a single .asm file with functions being transformed into labels
+
+#### Booting
+
+##### VM Programming convention
+
+One file in any VM program is expected to be named Main.vm;
+one VM function in this file is expected to be named main.
+
+##### VM implementation convention
+
+When the VM implementation starts running, or is reset, it starts
+executing the argument-less OS function Sys.init
+
+Sys.init then calls main.main, and enters an infinite loop.
+
+##### Hardware platform convention
+
+Code below should be put in the Hack ROM, starting at address 0
+```javascript
+// Bootstrap code (should be written in assembly) 
+SP=256 // sets stack pointer
+Call Sys.init
+```
+
+##### Standard mapping of the VM on the Hack Platform
+
+HACK RAM
+0...15         Pointers and Register
+16...255       Static Variables
+256...2047     Stack
+2048...16383   Heap
+16384...24576  Memory mapped I/O
+24577...32767  Unused space
+
+##### Special Symbols
+
+In addition to SP, LCL, ARG, THIS, THAT, R0-R15, we have
+- _Xxx.i_ symbols: Each static variable i in file Xxx.vm is translated to Xxx.j where j is incremented each time a new static variable is encountered in the file Xxx.vm.
+
+- _functionName $label_: let foo be a function within a VM file Xxx. Each label bar command within foo should generate and insert into the assembly code stream a symbol _Xxx.foo$bar_. When translating if-goto or goto statements, the full label must be used.
+
+- _functionName_: each function foo commands within a VM file Xxx should generate and insert into assembly code stream a symbol Xxx.foo that labels the entry point to the functions code.
+
+- _functionName $ret.i_: let foo be a function within a VM file Xxx. Within foo, each function call command should generate and insert into the assembly code stream a symbol Xxx.foo$ret.i where i is a running integer (one such symbol should be generated for each call command within foo). Symbol serves as the return address to the calling function.
+
+### VM Translator: Proposed Implementation
+
+Takes existing VM Translator and augments it to include the functional and branching commands.
+
+#### Main
+
+Input:
+- _fileName.vm_: The name of a single source file, or
+- _directoryName_: The name of a directory containing one or more .vm source files.
+
+Output:
+- _fileName.asm_ file, or
+- _directoryName.asm_ file
+
+Process:
+- Constructs a CodeWriter
+- If input is a .vm file:
+  - Constructs a Parser to handle the input file
+  - Marches through the input file, parsing each line and generating code form it.
+- If the input is a directory:
+  - Handles every .vm file in the directory in the manner described above.
+
+Should extend main written in project 7
+
+#### Parser
+
+Need to add ability to parse VM commands goto, if-goto, label, call, function and return
+
+#### CodeWriter
+
+Additional Functionality:
+- setFileName, filename (string), informs the codeWriter that the translation of a new VM file has started. (called by main program)
+- writeInit, (null), writes the bootstrap code. (must be at beginning)
+- writeLabel, label (string)
+- writeGoto, label (string)
+- writeIf, label (string)
+- writeFunction, functionName (string) numVars (int)
+- writeCall, functionName (string) numArgs (int)
+- writeReturn
+
