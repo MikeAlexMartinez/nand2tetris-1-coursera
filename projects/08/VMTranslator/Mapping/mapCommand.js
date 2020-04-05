@@ -37,6 +37,12 @@ function mapCommand(type) {
       return C_IF;
     case 'goto':
       return C_GOTO;
+    case 'function':
+      return C_FUNCTION;
+    case 'return':
+      return C_RETURNS;
+    case 'call':
+      return C_CALL;
     default:
       throw new Error(`Unexpected command type, received: ${type}`);
   }

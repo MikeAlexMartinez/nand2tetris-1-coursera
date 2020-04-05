@@ -12,7 +12,22 @@ const {
 
 function labelGenerator() {
   let labelCount = 0;
-  
+  let functionMap = {}
+
+  const getFunctionReturn = ({
+    fileName = '__',
+    functionName,
+  }) => {
+    let count
+    if (Object.hasOwnProperty.call(functionMap, functionName)) {
+      count = ++functionMap[functionName]
+    } else {
+      count = 1
+      functionMap[functionName] = count
+    }
+    return `${fileName}.${functionName}$ret.${count}`;
+  }
+
   const getNext = () => ({
     nextAddress: `@NEXT.${labelCount}`,
     nextLabel: `(NEXT.${labelCount})`,
@@ -23,16 +38,21 @@ function labelGenerator() {
     endLabel: `(END.${labelCount})`,
   });
 
-  return () => {
+  const getLabels = () => {
     labelCount++;
     return {
       getNext,
       getEnd
     };
   };
+
+  return {
+    getLabels,
+    getFunctionReturn,
+  };
 }
 
-const getLabels = labelGenerator();
+const { getLabels, getFunctionReturn } = labelGenerator();
 
 function memorySegmentMap(memory) {
   const map = {
@@ -293,6 +313,120 @@ function addComment(source, commands) {
   return [`// ${source}`, ...commands]
 }
 
+function addLocals(vars) {
+  let locals = []
+  // initialise locals to 0 and move SP
+  for (let i = 0; i < vars; i++) {
+    locals.push('@SP');
+    locals.push('A=M');
+    locals.push('M=0');
+    locals.push('@SP');
+    locals.push('M=M+1');
+  }
+  return locals;
+}
+
+function writeFunction(functionName, nVars) {
+  return [
+    // Add label
+    `(${functionName})`,
+    // Add required locals
+    ...addLocals(nVars),
+  ]
+}
+
+// push address on to stack
+function pushAddress(address) {
+  return [
+    `@${address}`,
+    'D=M',
+    '@SP',
+    'A=M',
+    'M=D',
+    '@SP',
+    'M=M+1',
+  ]
+}
+
+function writeCall(functionName, nArgs) {
+  const returnAddress = getFunctionReturn({ functionName })
+  return [
+    ...pushAddress(returnAddress),
+    ...pushAddress('LCL'),
+    ...pushAddress('ARG'),
+    ...pushAddress('THIS'),
+    ...pushAddress('THAT'),
+    // ARG = SP-n-5
+    `@${nArgs}`,
+    'D=A',
+    '@5',
+    'D=D+A',
+    '@SP',
+    'D=M-D',
+    '@ARG',
+    'M=D',
+    // LCL = SP
+    '@SP',
+    'D=M',
+    '@LCL',
+    'M=D',
+    // goto functionName
+    `@${functionName}`,
+    '0; JMP',
+    // Give return address
+    `(${returnAddress})`,
+  ]
+}
+
+function updateFrameMinusN(target, n) {
+  return [
+    `@${n}`,
+    'D=A', // D = n
+    '@R13',
+    'A=M-D', // set address to topOfFrame - n
+    'D=M', // store value in D
+    `@${target}`,
+    'M=D', // set target address to value in D
+  ]
+}
+
+function writeReturn() {
+  return [
+    // FRAME = LCL
+    '@LCL',
+    'D=M',
+    '@R13',
+    'M=D',
+    // RET = *(FRAME-5)
+    // Where RET is the ROM position to continue from
+    ...updateFrameMinusN('R14', 5),
+    // *ARG = pop()
+    '@SP',
+    'AM=M-1',
+    'D=M',
+    '@ARG',
+    'A=M',
+    'M=D',
+    // SP = ARG+1
+    '@ARG',
+    'D=M+1',
+    '@SP',
+    'M=D',
+    // THAT = *(FRAME-1)
+    ...updateFrameMinusN('THAT', 1),
+    // THIS = *(FRAME-2)
+    ...updateFrameMinusN('THIS', 2),
+    // ARG = *(FRAME-3)
+    ...updateFrameMinusN('ARG', 3),
+    // LCL = *(FRAME-4)
+    ...updateFrameMinusN('LCL', 4),
+    // goto RET
+    '@R14',
+    'A=M',
+    'D; JMP',
+  ]
+}
+
 function asmWriter() {
   let latestArithmetic = ''
 
@@ -318,6 +452,17 @@ function asmWriter() {
       case C_IF: {
         const [label] = elements;
         return addComment(source, writeIfGoTo(label, latestArithmetic));
+      }
+      case C_FUNCTION: {
+        const [functionName, vars] = elements;
+        return addComment(source, writeFunction(functionName, vars));
+      }
+      case C_CALL: {
+        const [functionName, args] = elements;
+        return addComment(source, writeCall(functionName, args));
+      }
+      case C_RETURNS: {
+        return addComment(source, writeReturn());
       }
       default:
         throw new Error(`Unexpected commandType received: ${commandType}`)

@@ -18,7 +18,30 @@ const split = (command) => {
 
 const parseRow = compose(split);
 
+const genBootstrap = () => {
+  return [
+    '// Bootstrap Code',
+    // set stack to 256
+    '@SP',
+    'M=256',
+    // Set LCL ARG THIS and THAT to illegal
+    // uninitialized values
+    '@LCL',
+    'M=-1',
+    '@ARG',
+    'M=-2',
+    '@THIS',
+    'M=-3',
+    '@THAT',
+    'M=-4',
+    // Call Sys.init function
+    '@Sys.init',
+    '0; JMP',
+  ]
+}
+
 function parser(asmWriter) {
+  const bootstrap = genBootstrap()
   const fileParser = (vmFile) => {
     let outputFile = [];
     vmFile.forEach((row) => {
@@ -29,7 +52,7 @@ function parser(asmWriter) {
         outputFile = outputFile.concat(asmRow);
       }
     });
-    return outputFile;
+    return bootstrap.concat(outputFile);
   }
 
   return fileParser;
