@@ -949,3 +949,15 @@ Additional Functionality:
 - writeCall, functionName (string) numArgs (int)
 - writeReturn
 
+#### Project 8: Building the VM Translator, Part 2
+
+Test Programs:
+- Program Flow
+  - BasicLoop.vm
+  - FibonacciSeries
+- FunctionCalls:
+  - SimpleFunction
+  - nestedCall
+  - FibonacciElement
+  - StaticsTest
+
