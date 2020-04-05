@@ -336,10 +336,10 @@ function writeFunction(functionName, nVars) {
 }
 
 // push address on to stack
-function pushAddress(address) {
+function pushAddress(address, isPointer) {
   return [
     `@${address}`,
-    'D=M',
+    `D=${isPointer ? 'M' : 'A'}`,
     '@SP',
     'A=M',
     'M=D',
@@ -352,10 +352,10 @@ function writeCall(functionName, nArgs) {
   const returnAddress = getFunctionReturn({ functionName })
   return [
     ...pushAddress(returnAddress),
-    ...pushAddress('LCL'),
-    ...pushAddress('ARG'),
-    ...pushAddress('THIS'),
-    ...pushAddress('THAT'),
+    ...pushAddress('LCL', true),
+    ...pushAddress('ARG', true),
+    ...pushAddress('THIS', true),
+    ...pushAddress('THAT', true),
     // ARG = SP-n-5
     `@${nArgs}`,
     'D=A',
