@@ -14,10 +14,7 @@ function labelGenerator() {
   let labelCount = 0;
   let functionMap = {}
 
-  const getFunctionReturn = ({
-    fileName = '__',
-    functionName,
-  }) => {
+  const getFunctionReturn = (functionName) => {
     let count
     if (Object.hasOwnProperty.call(functionMap, functionName)) {
       count = ++functionMap[functionName]
@@ -25,7 +22,7 @@ function labelGenerator() {
       count = 1
       functionMap[functionName] = count
     }
-    return `${fileName}.${functionName}$ret.${count}`;
+    return `${functionName}$ret.${count}`;
   }
 
   const getNext = () => ({
@@ -88,7 +85,14 @@ function genericPush() {
   ];
 }
 
-function pushWithStatic(address) {
+function pushWithStatic(fileName, index) {
+  return [
+    `@${fileName}.${index}`, // create memory offset value
+    ...genericPush(),
+  ];
+}
+
+function pushWithBase(address) {
   return [
     `@${address}`, // create memory offset value
     ...genericPush(),
@@ -117,7 +121,7 @@ function pushConstant(index) {
   ]
 }
 
-function writePushOp(memory, index, source) {
+function writePushOp(memory, index, source, fileName) {
   const base = getBase(memory, index);
   switch (memory) {
     // constant is push only
@@ -129,18 +133,29 @@ function writePushOp(memory, index, source) {
     case 'that':
       return [`// ${source}`, ...pushWithPointer(base, index)]
     case 'static':
+      return [`// ${source}`, ...pushWithStatic(fileName, index)]
     case 'temp': {
       const address = Number(base) + Number(index);
-      return [`// ${source}`, ...pushWithStatic(address)];
+      return [`// ${source}`, ...pushWithBase(address)];
     }
     case 'pointer':
-      return [`// ${source}`, ...pushWithStatic(base)]
+      return [`// ${source}`, ...pushWithBase(base)]
     default:
       throw Error(`memory segment is invalid: ${memory}`)
   }
 }
 
-function popWithStaticAddress(address) {
+function popWithStaticAddress(fileName, index) {
+  return [
+    '@SP',
+    'AM=M-1',
+    'D=M',
+    `@${fileName}.${index}`,
+    'M=D',
+  ];
+}
+
+function popWithBaseAddress(address) {
   return [
     '@SP',
     'AM=M-1',
@@ -167,21 +182,26 @@ function popWithPointerAddress(base, index) {
   ];
 }
 
-function writePopOp(memory, index, source) {
+function writePopOp(memory, index, source, fileName) {
   const base = getBase(memory, index);
-  if (memory === 'pointer') {
-    return [`// ${source}`, ...popWithStaticAddress(base)];
-  } else if (memory === 'static' || memory === 'temp') {
-    const address = Number(base) + Number(index);
-    return [`// ${source}`, ...popWithStaticAddress(address)];
+  switch(memory) {
+    case 'pointer':
+      return [`// ${source}`, ...popWithBaseAddress(base)];
+    case 'static':
+      return [`// ${source}`, ...popWithStaticAddress(fileName, index)];
+    case 'temp': {
+      const address = Number(base) + Number(index);
+      return [`// ${source}`, ...popWithBaseAddress(address)];
+    }
+    default:
+      return [`// ${source}`, ...popWithPointerAddress(base, index)];
   }
-  return [`// ${source}`, ...popWithPointerAddress(base, index)];
 }
 
-function writePushPopOps(commandType, memory, index, source) {
+function writePushPopOps(commandType, memory, index, source, fileName) {
   return commandType === C_PUSH
-    ? writePushOp(memory, index, source)
-    : writePopOp(memory, index, source);
+    ? writePushOp(memory, index, source, fileName)
+    : writePopOp(memory, index, source, fileName);
 }
 
 function operationMap(op) {
@@ -349,7 +369,7 @@ function pushAddress(address, isPointer) {
 }
 
 function writeCall(functionName, nArgs) {
-  const returnAddress = getFunctionReturn({ functionName })
+  const returnAddress = getFunctionReturn(functionName)
   return [
     ...pushAddress(returnAddress),
     ...pushAddress('LCL', true),
@@ -427,7 +447,7 @@ function writeReturn() {
   ]
 }
 
-function asmWriter() {
+function asmWriter(fileName) {
   let latestArithmetic = ''
 
   return (cmdObject) => {
@@ -440,7 +460,7 @@ function asmWriter() {
       case C_POP:
       case C_PUSH:
         const [memory, index] = elements;
-        return writePushPopOps(commandType, memory, index, source);
+        return writePushPopOps(commandType, memory, index, source, fileName);
       case C_LABEL: {
         const [label] = elements;
         return addComment(source, writeLabel(label));
@@ -469,4 +489,40 @@ function asmWriter() {
     }
   }
 }
-module.exports = asmWriter;
+const setValueForAddress = (val, address, negate) => [
+  `@${val}`,
+  'D=A',
+  ...(negate ? ['D=!D'] : []),
+  `@${address}`,
+  'M=D',
+]
+
+function getBootstrap() {
+  return [
+    '// Bootstrap Code',
+    // set stack to 256
+    ...setValueForAddress(256, 'SP'),
+    // Set LCL ARG THIS and THAT to illegal
+    // uninitialized values
+    ...setValueForAddress(0, 'LCL', true),
+    ...setValueForAddress(1, 'ARG', true),
+    ...setValueForAddress(2, 'THIS', true),
+    ...setValueForAddress(3, 'THAT', true),
+    // Call Sys.init function
+    ...writeCall('Sys.init', 0),
+  ]
+}
+
+function getFileEnd() {
+  return [
+    '(END_OF_PROGRAM)',
+    '@END_OF_PROGRAM',
+    '0; JMP',
+  ]
+}
+
+module.exports = {
+  asmWriter,
+  getBootstrap,
+  getFileEnd,
+};

@@ -903,7 +903,7 @@ HACK RAM
 In addition to SP, LCL, ARG, THIS, THAT, R0-R15, we have
 - _Xxx.i_ symbols: Each static variable i in file Xxx.vm is translated to Xxx.j where j is incremented each time a new static variable is encountered in the file Xxx.vm.
 
-- _functionName $label_: let foo be a function within a VM file Xxx. Each label bar command within foo should generate and insert into the assembly code stream a symbol _Xxx.foo$bar_. When translating if-goto or goto statements, the full label must be used.
+- _functionName $label_: let foo be a function within a VM file Xxx. Each label bar command within foo should generate and insert into the assembly code stream a symbol _Xxx.foo$bar_. When translating if-goto or goto statements, the full label must be used  .
 
 - _functionName_: each function foo commands within a VM file Xxx should generate and insert into assembly code stream a symbol Xxx.foo that labels the entry point to the functions code.
 
@@ -953,8 +953,8 @@ Additional Functionality:
 
 Test Programs:
 - Program Flow
-  - BasicLoop.vm
-  - FibonacciSeries
+  - BasicLoop.vm (tests branching commands)
+  - FibonacciSeries ()
 - FunctionCalls:
   - SimpleFunction
   - nestedCall

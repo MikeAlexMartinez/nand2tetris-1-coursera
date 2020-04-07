@@ -9,7 +9,7 @@ A=M
 M=D
 @SP
 M=M+1
-// pop pointer 1           
+// pop pointer 1
 @SP
 AM=M-1
 D=M
@@ -23,7 +23,7 @@ A=M
 M=D
 @SP
 M=M+1
-// pop that 0              
+// pop that 0
 @0
 D=A
 @THAT
@@ -44,7 +44,7 @@ A=M
 M=D
 @SP
 M=M+1
-// pop that 1              
+// pop that 1
 @1
 D=A
 @THAT
@@ -83,7 +83,7 @@ D=M
 @SP
 A=M-1
 M=M-D
-// pop argument 0          
+// pop argument 0
 @0
 D=A
 @ARG
@@ -109,13 +109,13 @@ A=M
 M=D
 @SP
 M=M+1
-// if-goto COMPUTE_ELEMENT 
+// if-goto COMPUTE_ELEMENT
 @SP
 AM=M-1
 D=M
 @COMPUTE_ELEMENT
 D; JGT
-// goto END_PROGRAM        
+// goto END_PROGRAM
 @END_PROGRAM
 0; JMP
 // label COMPUTE_ELEMENT
@@ -149,7 +149,7 @@ D=M
 @SP
 A=M-1
 M=M+D
-// pop that 2              
+// pop that 2
 @2
 D=A
 @THAT
@@ -185,7 +185,7 @@ D=M
 @SP
 A=M-1
 M=M+D
-// pop pointer 1           
+// pop pointer 1
 @SP
 AM=M-1
 D=M
@@ -217,7 +217,7 @@ D=M
 @SP
 A=M-1
 M=M-D
-// pop argument 0          
+// pop argument 0
 @0
 D=A
 @ARG
