@@ -961,3 +961,139 @@ Test Programs:
   - FibonacciElement
   - StaticsTest
 
+## Week 9 - The Jack Language
+
+- A simple Java-like language
+- Object based with no inheritance
+- Multi-purpose
+- Lends itself to interactive apps
+- Can be learned quickly and easily
+
+Three Kinds of comments
+/* block comment */
+/** API block comment */
+// single line
+
+Procedural Processing
+- A jack prgram is a collection of one or more Jack Classes, one of which must be called Main.
+-  The main class must have a single function called main
+- Program's entry point: Main.main
+
+Flow of control - if, while, do
+
+Arrays:
+- array is iomplemented as part of standard class library
+- Jack arrays are not typed.
+
+Operating System Services:
+- Keyboard.readInt
+- Output.printString
+- Output.printInt
+- More...
+
+Jack Data Types:
+- Primitives:
+  1. int
+  2. char
+  3. boolean
+
+- Class Types:
+- OS: Array, String, ...
+Program extensions as needed.
+
+### Object based programming
+
+Abstraction - Implementation
+- Users of an abstraction need know nothing about its implementation
+- All they need is the class interface (API)
+
+Building a class
+- What data do we need?
+- Accessors - how to get a value from a class
+- Public access of variables is disallowed in JACK
+- Need a constructor to pass data into the class.
+- need to return this from constuctor
+- need to return from all functions regardless of whether they return a value.
+- dispose - All objects need to use the dispose method in order to free up the memory used by the object. JACK has no garbage collection.
+
+- Compiler, works ahead of time with OS to allocate memory to a program.
+
+### List Processing
+
+List definition
+- The atom null, or
+- an atom, followed by a list
+
+Notation: (atom, list)
+
+Examples:
+null
+(5, null)
+(3, (5, null))
+(1, ... , (n, null))
+Abbreviated as: (), (5), (3, 5)
+
+List example:
+v - pointer variable points to base address of list.
+each element consists of value and address of next value in list.
+- constructor
+- atom
+Adding to a list involves passing a value and the base address of the previous item.
+
+Sequential access:
+- Use while loop to print value of current list item until it is null. Need to move list along each time.
+- dispose: recursively disposes of the tail of the operation.
+
+What makes the magic work?
+- High-level: the constructor
+- Low-level: when compiling the constructor, the compiler plants calls to OS routines that find, and allocate, available memory space for the new object.
+
+### Jack Language Specification
+
+#### Syntax
+
+Elements:
+- White space / comments
+- keywords
+- Symbols
+- Constants
+- Identifiers
+
+##### Keywords
+
+Program Components:
+- class, constructor, method, function
+Primitive Types:
+- int, boolean, char, void
+Variable declarations
+- var, static, field
+Statements
+- let, do, if, else, while, return
+Constant values
+- true, false, null
+Object Reference
+- this
+
+##### Symbols
+
+() grouping
+[] array indexing
+{} groups programmatic units
+, Variable list separator
+; Statement terminator
+= Assignment and comparison operator
+. Class membership
++ - * / & | ~ < > Operators
+
+##### Constants
+
+Integer constants e.g. 0 5 100
+String constants e.g. "hello"
+Boolean - see above
+null
+
+##### identifiers
+
+first char must be letter or _.
+
+#### Data Types
