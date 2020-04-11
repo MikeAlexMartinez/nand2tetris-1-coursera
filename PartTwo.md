@@ -1097,3 +1097,204 @@ null
 first char must be letter or _.
 
 #### Data Types
+
+Primitive Types:
+- int: Non-negative 2's complement integer, 0 to 32767
+- boolean: true or false
+- char: Unicode character
+
+Class Types:
+- Can extend primitive types as required
+
+##### Type Conversions
+Number can be converted to character using the Unicode value.
+e.g. var char c; let c = 65; // 'A' or/
+var String s; let s = "A"; let c = s.charAt(0);
+
+An integer can be assigned to a reference variable, in which case, 
+it is treated as a memory address.
+
+e.g. 
+var Array arr;
+let arr = 5000;
+let arr[100] = 17;
+
+An object can be converted into an Array and vice versa
+var Fraction a;
+var Array arr;
+let arr = Array.new(2);
+let arr[0] = 2; let arr[1] = 5;
+let x = arr;
+do x.print() // will print 2/5
+
+#### Classes
+
+- Class = basic complilation unit
+- each class Foo is stored in a separate Foo.jack file
+- The class name's first character must be an uppercase letter.
+
+begins with field variable declarations
+then static variable declarations
+then subroutine declarations
+
+Classes that provide functionality
+- contain functions only
+- Library of services
+
+Classes that represent entities.
+- Fractions, String etc
+
+JACKS's standard class library / OS
+
+Math
+String
+Array
+Output
+Screen
+Keyboard
+Memory
+Sys
+
+#### Methods
+
+subroutines can be constructors methods or functions.
+
+Must be typed and must return something.
+
+You can have more than one constructor.
+
+Variables:
+- static variables - class level subroutines
+- Field variables - Object properties, can be manipulated by the class constructors and methods.
+- local variables - used by subroutines for local computations
+- parameter variables - used to pass to subroutines, behaves like local variables.
+
+Variables must be ...
+- declared before they are used
+- Typed
+
+Subroutine calls:
+
+Strings:
+var String s;
+var char c;
+
+// hiding complexity of operations that do this
+Compiler allows:
+let s = "Hello world";
+
+Arrays:
+- instances (objects) of the OS class Array
+- not typed
+- uni-dimensional
+
+Multi-dimensional arrays need to be Arrays, of arrays.
+
+#### Peculiar features of JACK
+
+The keyword let must be used in assignment.
+
+The keyword let must be used for function calls outside an expression.
+
+Body of a statement must be within curly brackets, even if it contains a single statement.
+
+All subroutines must end with a return
+
+No operator priority:
+- The following is unpredictable: 2 + 3 * 4.
+- Must used parentheses to force ordering of operations.
+- Language is weakly typed.
+
+### Developing Apps using the JACK Language and OS
+
+Use JackCompiler to compile jack files and the VM emulator
+to test the application.
+
+Textual apps:
+- Screen: 23 rows of 64 characters, b&w
+- Font: featured by jack OS
+- Output: Jack OS Output class
+
+class Output {
+  function void moveCursor(int i, int j)
+  function void printChar(char c)
+  function void printString(String s)
+  function void printInt(int i)
+  function void println()
+  function void backSpace()  
+}
+
+Handling Output Graphics:
+Graphical apps:
+- Screen: 256 rows of 512 picels, b&w
+- Output: Jack OS Screen class (or do your own)
+
+Handling Inputs
+- Standard keyboard
+- Input programming: use the OS Keyboard class
+
+Class Keyboard {
+  function char keyPressed()
+  function char readChar()
+  function String readLine(String message)
+  function int readInt(String message)
+}
+
+class Memory {
+  function int peek(int Address)
+  function void poke(int address, int value)
+  function Array alloc(int size)
+  function void deAlloc()
+}
+
+Class Sys {
+  function void halt()
+  function void error(int errorCode)
+  function void halt(int duration)
+}
+
+Sample Jack Programs:
+- Square
+- Pong
+- Average
+- Complex Arrays
+- ConvertToBin
+
+Best Practice:
+- Watch some existing Jack apps
+- Play with supplied apps, and review their code
+- Understand UX limitations of the JACK IO
+- plan your app carefully
+- implement, test and have fun!
+
+Technical
+- Writing - use standard text editor
+- Optimizing - see the graphics optimization lecture
+- Documenting: use standard practice
+
+### A sample jack App: Square Dance
+
+Illustrates:
+- OO Design
+- A typical interactive application
+- Handling inputs and outputs
+- Using the OS
+
+### Graphics Optimization
+
+Games typically made from sprites.
+
+Sprite: A two-dimensional bitmap, typically integrated into a larger scene.
+Challenges:
+- drawing sprites quickly
+- Creating smooth animations
+
+Solutions:
+- Use the standard OS graphics library
+- Use your own library
+
+Can use memory class to peek and poke to select an address and change it.
+
+Custom Drawing:
+- Render image by writing numbers into addresses. 
+
