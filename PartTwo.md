@@ -1226,7 +1226,7 @@ class Output {
 
 Handling Output Graphics:
 Graphical apps:
-- Screen: 256 rows of 512 picels, b&w
+- Screen: 256 rows of 512 pixels, b&w
 - Output: Jack OS Screen class (or do your own)
 
 Handling Inputs
