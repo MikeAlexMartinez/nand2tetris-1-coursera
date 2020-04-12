@@ -1,0 +1,56 @@
+
+/**
+ * Represents a Snake game.
+ */
+class SnakeGame {
+
+  static SnakeGame instance;   // the singleton, a SnakeGame instance
+  field Snake snake; 
+  field Scoreboard scoreboard; // controls the scoreboard at the right of the screen
+  field int speed;             // controls the speed of the snake and scoring accumulator
+
+  constructor SnakeGame new() {
+    do Screen.clearScreen();
+
+    let speed = 10;
+    let scoreboard = Scoreboard.new();
+
+    return this;
+  }
+
+  method void run() {
+    var char key; // key currently pressed by user
+    var boolean exit;
+    let snake = Snake.new();
+    let exit = false;
+
+    while(~exit) {
+      while (key = 0) {
+        let key = Keyboard.keyPressed();
+        do snake.move();
+      }
+
+      if (key = 131) { do snake.updateDirection(1); }   // up arrow
+      if (key = 133) { do snake.updateDirection(2); }   // down arrow
+      if (key = 130) { do snake.updateDirection(3); }   // left arrow
+      if (key = 132) { do snake.updateDirection(4); }   // right arrow
+
+      // waits for the key to be released
+      while (~(key = 0)) {
+        let key = Keyboard.keyPressed();
+        do snake.move();
+      }
+    }
+
+    // cleanup
+    do snake.dispose();
+
+    return;
+  }
+
+  method void dispose() {
+    do scoreboard.dispose();
+    do Memory.deAlloc(this);
+    return;
+  }
+}

@@ -4,7 +4,7 @@
 # mark.armbrust@pobox.com
 
 # User's CDPATH can interfere with cd in this script
-unset CDPATH
+# unset CDPATH
 # Get the true name of this script
 script="`test -L "$0" && readlink -n "$0" || echo "$0"`"
 dir="$PWD"

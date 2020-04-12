@@ -1,0 +1,29 @@
+
+
+class Snake {
+
+  field Grid grid;
+  field Array head;     // tracks the position on the grid of the head
+  field Array tail;     // tracks the position on the grid of the snake
+  field char direction; // the current direction of the snake
+
+  constructor Snake new() {
+    let grid = Grid.new();
+    let direction = 4;
+    return this;
+  }
+
+  /**
+   * Change direction
+   * 1 = up, 2 = down, 3 = left, 4 = right
+   *
+  method void updateDirection(int direction) {
+    return;
+  }
+
+  method void dispose() {
+    do grid.dispose();
+    do Memory.deAlloc(this);
+    return;
+  }
+}

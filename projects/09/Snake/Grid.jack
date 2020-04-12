@@ -1,0 +1,117 @@
+
+/**
+ *  accessible grid for snake is:
+ *  14 * 16px high
+ *  30 * 16px wide
+ */
+class Grid {
+
+  field int height;
+  field int width;
+
+  constructor Grid new() {
+    do drawGrid();
+    return this;
+  }
+
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+
+  method void drawGrid() {
+    do drawVertical(-128, 8); // Left side
+    do drawVertical(127, 31); // right side
+    do drawHorizontal(-1, 8, 9, 21); // top side
+    do drawHorizontal(-1, 239, 9, 21); // bottom side
+    return;
+  }
+
+  /* starts snake as 5 blocks of 8 by 8 pixels */
+  method void drawSnake() {
+    do drawHorizontal(-1, 112, 14, 5); // Snake Start
+    return;
+  }
+
+  /**
+   * returns int that represents whether snake will encounter
+   * an object when completing next move.
+   * 0 = nothing
+   * 1 = tail
+   * 2 = wall
+   * 3 = food
+   */
+  method int detectCollision(int col, int row) {
+    var int collision;
+
+    let collision = 0;
+    // if col or row outside boundary return 2
+
+    // else inside,
+    //    check tail
+    //        return 1
+    //    check food
+    //        return 
+    return collision;
+  }
+
+  method void drawFood() {
+    // generate location using randRange
+
+    // if selected range has snake, regen
+
+    // drawFood
+    return;
+  }
+
+  /* draw the sides of the snake container */
+  method void drawVertical(int value, int column) {
+    var int memAddress, start, end;
+    var int increment, diff;
+
+    let memAddress = 16384 + column;
+    let start = 8;
+    let end = 247;
+    let increment = 32;
+    let diff = start * increment;
+
+    while(~(start > end)) {
+      do Memory.poke(memAddress + diff, value);
+      let start = start + 1;
+      let diff = diff + increment;
+    }
+
+    return;
+  }
+
+  method void drawHorizontal(int value, int row, int colStart, int cols) {
+    var int memAddress; // active memory address
+    var int start, end; // number of rows
+    var int col, colEnd; // number of columns
+
+    let start = row;
+    let end = start + 8;
+    let col = colStart;
+    let colEnd = col + cols;
+
+    // do column
+    while(~(start > end)) {
+      let memAddress = 16384 + col + (32 * start) - 1;
+
+      // do row
+      while(~(col > colEnd)) {
+        let memAddress = memAddress + 1;
+        do Memory.poke(memAddress, value);
+        let col = col + 1;
+      }
+
+      // reset column
+      let col = colStart;
+
+      // increment starting point
+      let start = start + 1;
+    }
+
+    return;
+  }
+}
