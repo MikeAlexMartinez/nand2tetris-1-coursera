@@ -5,6 +5,8 @@ class Game {
   field Grid grid;
   field int direction;
   field int speed;
+  field bool hasMessage;
+  field int moves;
 
   constructor Game new(int gameSpeed, Scoreboard newBoard) {
     let grid = Grid.new();
@@ -28,6 +30,7 @@ class Game {
 
     // Snake always starts going right from centre
     let direction = 4;
+    let moves = 0;
 
     while(~end) {
       let ticks = 0;
@@ -53,8 +56,9 @@ class Game {
           do updateDirection(4);
         }
 
-        if (ticks > 1000) {
+        if (hasMessage & (moves > 10)) {
           do score.clearMessage();
+          let hasMessage = false;
         }
 
         let ticks = ticks + wait;
@@ -93,6 +97,7 @@ class Game {
     var boolean end;
     var int state;
 
+    let moves = moves + 1;
     let state = snake.move(direction);
     if ((state = 2) | (state = 1)) {
       do score.gameOver();
@@ -102,6 +107,8 @@ class Game {
     if (state = 3) {
       do score.updateScore(speed);
       do score.showMessage("Yum Yum!");
+      let moves = 0;
+      let hasMessage = true;
     }
 
     return end;

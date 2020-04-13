@@ -72,10 +72,6 @@ class Scoreboard {
     return;
   }
 
-  method int getSpeed() {
-    return speed;
-  }
-
   /* show direction */
   method void updateDirection(int direction) {
     do Output.moveCursor(12, 1);
