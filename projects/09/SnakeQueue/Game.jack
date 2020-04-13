@@ -1,0 +1,94 @@
+class Game {
+
+  field Snake snake;
+  field Scoreboard score;
+  field int direction;
+  field int speed;
+
+  constructor Game new(int gameSpeed) {
+    let speed = gameSpeed;
+    let snake = Snake.new();
+    let score = Scoreboard.new(speed);
+    return this;
+  }
+
+  method void run() {
+    var char key;
+    var bool end;
+    var int ticks, wait;
+
+    let direction = 4;
+    while(~end) {
+      let ticks = 0;
+
+      while(ticks < 10000) {
+        let wait = speed;
+        let key = Keyboard.keyPressed();
+
+        // up arrow
+        if (key = 131) {
+          do updateDirection(1);
+        }
+        // down arrow
+        if (key = 133) {
+          do updateDirection(2);
+        }
+        // left arrow
+        if (key = 130) {
+          do updateDirection(3);
+        }
+        // right arrow
+        if (key = 132) {
+          do updateDirection(4);
+        }
+
+        let ticks = ticks + wait;
+      }
+
+      let end = move();
+    } 
+
+    return;
+  }
+
+  /**
+   * Change direction
+   * 1 = up, 2 = down, 3 = left, 4 = right
+   *
+   * won't change direction if newDirection is
+   * inverse of current direction
+   */
+  method void updateDirection(int newDirection) {
+    if (
+      // Direction has changed
+      ~(direction = newDirection) &
+      // direction isn't inverse of current direction
+      ~((direction = 1 & newDirection = 2) |
+        (newDirection = 1 & direction = 2) |
+        (direction = 3 & newDirection = 4) |
+        (newDirection = 4 & direction = 3)
+      )
+    ) {
+      let direction = newDirection;
+    }
+    return;
+  }
+
+  method boolean move() {
+    var boolean end;
+    var int state;
+
+    let state = snake.move(direction);
+    do score.setState(state);
+
+    if ((state = 2) | (state = 1)) {
+      do score.gameOver();
+      let end = true;
+    }
+    if (state = 3) {
+      do score.updateScore(speed);
+    }
+
+    return end;
+  }
+}

@@ -1,0 +1,30 @@
+class Utils {
+  /* returns a % b */
+  function int mod(int a, int b) {
+    var int d;
+    var int r;
+    let d = Math.divide(a,b);
+    let r = a - (b * d);
+    return r;
+  }
+
+  /* returns whether number isEven, 0 is considered even */
+  function boolean isEven(int a) {
+    var int modulo;
+    var boolean even;
+
+    if (a < 2) { 
+      let modulo = a;
+    } else {
+      let modulo = Utils.mod(a, 2);
+    }
+
+    if (modulo = 0) {
+      let even = true;
+    } else {
+      let even = false;
+    }
+
+    return even;
+  }
+}

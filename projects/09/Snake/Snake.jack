@@ -87,13 +87,13 @@ class Snake {
     if (direction = 1) {
       // move up
       let newHead[0] = head[0];
-      let newHead[1] = head[1] - 1;
+      let newHead[1] = head[1] + 1;
     }
 
     if (direction = 2) {
       // move down
       let newHead[0] = head[0];
-      let newHead[1] = head[1] + 1;
+      let newHead[1] = head[1] - 1;
     }
 
     if (direction = 3) {

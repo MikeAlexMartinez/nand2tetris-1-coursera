@@ -76,4 +76,11 @@ class Scoreboard {
     do Output.printInt(direction);
     return;
   }
+
+  /* Game over! */
+  method void gameOver() {
+    do Output.moveCursor(14, 1);
+    do Output.printString("GAME OVER!");
+    return;
+  }
 }

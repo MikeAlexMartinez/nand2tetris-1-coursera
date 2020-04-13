@@ -1,0 +1,10 @@
+class Main {
+  function void main() {
+    var Game game;
+
+    do LCGRandom.setSeed(10);
+    let game = Game.new(1);
+    do game.run();
+    return;
+  }
+}
