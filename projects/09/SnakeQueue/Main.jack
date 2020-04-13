@@ -1,10 +1,21 @@
 class Main {
   function void main() {
     var Game game;
+    var Scoreboard board;
+    var Menu menu;
+    var int speed;
 
+    // Set up
     do LCGRandom.setSeed(10);
-    let game = Game.new(1);
+    let menu = Menu.new();
+
+    // show / process menu
+    let board = menu.show();
+
+    // run game
+    let game = Game.new(1, board);
     do game.run();
+
     return;
   }
 }

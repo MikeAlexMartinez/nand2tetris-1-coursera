@@ -5,11 +5,17 @@ class Game {
   field int direction;
   field int speed;
 
-  constructor Game new(int gameSpeed) {
-    let speed = gameSpeed;
+  constructor Game new(int gameSpeed, Scoreboard newBoard) {
     let snake = Snake.new();
-    let score = Scoreboard.new(speed);
+    let speed = gameSpeed;
+    let score = newBoard;
     return this;
+  }
+
+  method void dispose() {
+    do snake.dispose();
+    do Memory.deAlloc(this);
+    return;
   }
 
   method void run() {

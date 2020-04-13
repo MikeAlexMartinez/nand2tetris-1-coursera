@@ -7,9 +7,16 @@
 class Scoreboard {
 
   field int score; // tracks user score
+  field int speed; // tracks game speed
 
-  constructor Scoreboard new() {
+  constructor Scoreboard new(int gameSpeed) {
     let score = 0;
+
+    if (gameSpeed = 0) {
+      let speed = 1;
+    } else {
+      let speed = gameSpeed;
+    }
 
     do setHeading();
     do setScore();
@@ -50,15 +57,21 @@ class Scoreboard {
   method void setSpeed() {
     do Output.moveCursor(7, 1);
     do Output.printString("SPEED: ");
-    do updateSpeed(10);
+    do updateSpeed(speed);
     return;
   }
 
   /* Update speed of the game on the scoreboard */
   method void updateSpeed(int newSpeed) {
+    let speed = newSpeed;
     do Output.moveCursor(7, 8);
     do Output.printInt(newSpeed);
+    do Output.printString(" ");
     return;
+  }
+
+  method int getSpeed() {
+    return speed;
   }
 
   /* Display Game State */

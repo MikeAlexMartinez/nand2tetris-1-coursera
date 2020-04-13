@@ -2,13 +2,24 @@ function Game.new 0
 push constant 4
 call Memory.alloc 1
 pop pointer 0
-push argument 0
-pop this 3
 call Snake.new 0
 pop this 0
-call Scoreboard.new 0
+push argument 0
+pop this 3
+push argument 1
 pop this 1
 push pointer 0
+return
+function Game.dispose 0
+push argument 0
+pop pointer 0
+push this 0
+call Snake.dispose 1
+pop temp 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
 return
 function Game.run 4
 push argument 0

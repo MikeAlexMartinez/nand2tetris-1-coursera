@@ -1,5 +1,8 @@
-
-
+/**
+ * Snake is reponsible for tracking the position of the
+ * snakes head and uses the Queue data structure to 
+ * keep track of the position of the snakes tail.
+ */
 class Snake {
 
   field Array head;
@@ -7,10 +10,17 @@ class Snake {
   field Grid grid;
 
   constructor Snake new() {
-    let snake = Queue.new(50);
+    let snake = Queue.new(22*14);
     let grid = Grid.new();
     do buildSnake();
     return this;
+  }
+
+  method void dispose() {
+    do grid.dispose();
+    do snake.dispose();
+    do Memory.deAlloc(this);
+    return;
   }
 
   method void buildSnake() {
