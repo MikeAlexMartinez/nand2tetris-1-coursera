@@ -10,7 +10,7 @@ class Main {
     do LCGRandom.setSeed(10);
     let menu = Menu.new();
 
-    while() {
+    while(true) {
       // show / process menu
       let board = menu.show(played);
 
