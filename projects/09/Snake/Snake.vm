@@ -68,8 +68,7 @@ push temp 0
 pop that 0
 push pointer 0
 push local 2
-push constant 0
-call Snake.updateHead 3
+call Snake.updateHead 2
 pop temp 0
 push local 0
 push constant 1
@@ -77,8 +76,6 @@ add
 pop local 0
 goto WHILE_EXP0
 label WHILE_END0
-push local 2
-pop this 1
 push constant 0
 return
 function Snake.updateHead 0
@@ -92,13 +89,8 @@ push this 0
 push argument 1
 call Grid.updateHead 2
 pop temp 0
-push argument 2
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
 push argument 1
 pop this 1
-label IF_FALSE0
 push constant 0
 return
 function Snake.updateTail 1

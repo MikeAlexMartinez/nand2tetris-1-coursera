@@ -24,6 +24,7 @@ class SnakeGame {
     var boolean exit;
     var int collision;
     let snake = Snake.new(4); // set direction to right
+    do scoreboard.updateDirection(4);
     let exit = false;
 
     while(~exit) {
@@ -33,10 +34,26 @@ class SnakeGame {
         do scoreboard.showState(collision);
       }
 
-      if (key = 131) { do snake.updateDirection(1); }   // up arrow
-      if (key = 133) { do snake.updateDirection(2); }   // down arrow
-      if (key = 130) { do snake.updateDirection(3); }   // left arrow
-      if (key = 132) { do snake.updateDirection(4); }   // right arrow
+      // up arrow
+      if (key = 131) {
+        do scoreboard.updateDirection(1);
+        do snake.updateDirection(1);
+      }
+      // down arrow
+      if (key = 133) {
+        do scoreboard.updateDirection(2);
+        do snake.updateDirection(2);
+      }
+      // left arrow
+      if (key = 130) {
+        do scoreboard.updateDirection(3);
+        do snake.updateDirection(3);
+      }
+      // right arrow
+      if (key = 132) {
+        do scoreboard.updateDirection(4);
+        do snake.updateDirection(4);
+      }
 
       // waits for the key to be released
       while (~(key = 0)) {

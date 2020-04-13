@@ -19,6 +19,10 @@ pop pointer 0
 push constant 4
 call Snake.new 1
 pop this 0
+push this 1
+push constant 4
+call Scoreboard.updateDirection 2
+pop temp 0
 push constant 0
 pop local 1
 label WHILE_EXP0
@@ -49,6 +53,10 @@ eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
+push this 1
+push constant 1
+call Scoreboard.updateDirection 2
+pop temp 0
 push this 0
 push constant 1
 call Snake.updateDirection 2
@@ -60,6 +68,10 @@ eq
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
+push this 1
+push constant 2
+call Scoreboard.updateDirection 2
+pop temp 0
 push this 0
 push constant 2
 call Snake.updateDirection 2
@@ -71,6 +83,10 @@ eq
 if-goto IF_TRUE2
 goto IF_FALSE2
 label IF_TRUE2
+push this 1
+push constant 3
+call Scoreboard.updateDirection 2
+pop temp 0
 push this 0
 push constant 3
 call Snake.updateDirection 2
@@ -82,6 +98,10 @@ eq
 if-goto IF_TRUE3
 goto IF_FALSE3
 label IF_TRUE3
+push this 1
+push constant 4
+call Scoreboard.updateDirection 2
+pop temp 0
 push this 0
 push constant 4
 call Snake.updateDirection 2

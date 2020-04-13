@@ -36,20 +36,16 @@ class Snake {
       let snakeSegment = Array.new(2);
       let snakeSegment[0] = startCol;
       let snakeSegment[1] = 7;
-      do updateHead(snakeSegment, false);
+      do updateHead(snakeSegment);
       let startCol = startCol + 1;
     }
-
-    let head = snakeSegment;
     return;
   }
 
-  method void updateHead(Array newHead, bool update) {
+  method void updateHead(Array newHead) {
     do snake.pushHead(newHead);
     do grid.updateHead(newHead);
-    if (update) {
-      let head = newHead;
-    }
+    let head = newHead;
     return;
   }
 
@@ -116,12 +112,12 @@ class Snake {
 
     if (collision = 0) {
       // nothing interesting has happened, move head and tail
-      do updateHead(newHead, true);
+      do updateHead(newHead);
       do updateTail();
     } else {
       if (collision = 3) {
         // move head
-        do updateHead(newHead, true);
+        do updateHead(newHead);
 
         // don't need to move tail as snake
         // gets longer

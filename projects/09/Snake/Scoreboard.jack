@@ -67,4 +67,12 @@ class Scoreboard {
     do Output.printInt(state);
     return;
   }
+
+  /* show direction */
+  method void updateDirection(int direction) {
+    do Output.moveCursor(12, 1);
+    do Output.printString("Direction: ");
+    do Output.printInt(direction);
+    return;
+  }
 }
