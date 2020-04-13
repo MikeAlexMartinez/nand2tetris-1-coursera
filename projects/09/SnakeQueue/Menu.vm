@@ -4,8 +4,7 @@ call Memory.alloc 1
 pop pointer 0
 push constant 1
 pop this 0
-push this 0
-call Scoreboard.new 1
+push argument 0
 pop this 1
 push pointer 0
 return
@@ -98,12 +97,13 @@ goto WHILE_EXP2
 label WHILE_END2
 goto WHILE_EXP0
 label WHILE_END0
-push this 1
+push this 0
 return
 function Menu.displayMenu 0
 push argument 0
 pop pointer 0
 push argument 1
+not
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
@@ -266,7 +266,7 @@ call String.appendChar 2
 call Output.printString 1
 pop temp 0
 push constant 7
-push constant 24
+push constant 28
 call Output.moveCursor 2
 pop temp 0
 push constant 26
@@ -431,9 +431,28 @@ call String.appendChar 2
 call Output.printString 1
 pop temp 0
 push argument 1
+not
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
+push constant 6
+call String.new 1
+push constant 66
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 103
+call String.appendChar 2
+push constant 105
+call String.appendChar 2
+push constant 110
+call String.appendChar 2
+push constant 33
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+goto IF_END1
+label IF_FALSE1
 push constant 8
 call String.new 1
 push constant 82
@@ -449,24 +468,6 @@ call String.appendChar 2
 push constant 114
 call String.appendChar 2
 push constant 116
-call String.appendChar 2
-push constant 33
-call String.appendChar 2
-call Output.printString 1
-pop temp 0
-goto IF_END1
-label IF_FALSE1
-push constant 6
-call String.new 1
-push constant 66
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 103
-call String.appendChar 2
-push constant 105
-call String.appendChar 2
-push constant 110
 call String.appendChar 2
 push constant 33
 call String.appendChar 2

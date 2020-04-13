@@ -1,11 +1,14 @@
 function Game.new 0
-push constant 4
+push constant 5
 call Memory.alloc 1
 pop pointer 0
-call Snake.new 0
+call Grid.new 0
+pop this 2
+push this 2
+call Snake.new 1
 pop this 0
 push argument 0
-pop this 3
+pop this 4
 push argument 1
 pop this 1
 push pointer 0
@@ -16,6 +19,9 @@ pop pointer 0
 push this 0
 call Snake.dispose 1
 pop temp 0
+push this 2
+call Grid.dispose 1
+pop temp 0
 push pointer 0
 call Memory.deAlloc 1
 pop temp 0
@@ -25,7 +31,7 @@ function Game.run 4
 push argument 0
 pop pointer 0
 push constant 4
-pop this 2
+pop this 3
 label WHILE_EXP0
 push local 1
 not
@@ -39,7 +45,7 @@ push constant 10000
 lt
 not
 if-goto WHILE_END1
-push this 3
+push this 4
 pop local 3
 call Keyboard.keyPressed 0
 pop local 0
@@ -103,11 +109,11 @@ return
 function Game.updateDirection 0
 push argument 0
 pop pointer 0
-push this 2
+push this 3
 push argument 1
 eq
 not
-push this 2
+push this 3
 push constant 1
 eq
 push argument 1
@@ -117,12 +123,12 @@ eq
 push argument 1
 push constant 1
 eq
-push this 2
+push this 3
 and
 push constant 2
 eq
 or
-push this 2
+push this 3
 push constant 3
 eq
 push argument 1
@@ -133,7 +139,7 @@ or
 push argument 1
 push constant 4
 eq
-push this 2
+push this 3
 and
 push constant 3
 eq
@@ -144,7 +150,7 @@ if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
 push argument 1
-pop this 2
+pop this 3
 label IF_FALSE0
 push constant 0
 return
@@ -152,7 +158,7 @@ function Game.move 2
 push argument 0
 pop pointer 0
 push this 0
-push this 2
+push this 3
 call Snake.move 2
 pop local 1
 push local 1
@@ -168,6 +174,9 @@ label IF_TRUE0
 push this 1
 call Scoreboard.gameOver 1
 pop temp 0
+push this 2
+call Grid.clearGrid 1
+pop temp 0
 push constant 0
 not
 pop local 0
@@ -179,8 +188,29 @@ if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
 push this 1
-push this 3
+push this 4
 call Scoreboard.updateScore 2
+pop temp 0
+push this 1
+push constant 8
+call String.new 1
+push constant 89
+call String.appendChar 2
+push constant 117
+call String.appendChar 2
+push constant 109
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 89
+call String.appendChar 2
+push constant 117
+call String.appendChar 2
+push constant 109
+call String.appendChar 2
+push constant 33
+call String.appendChar 2
+call Scoreboard.showMessage 2
 pop temp 0
 label IF_FALSE1
 push local 0

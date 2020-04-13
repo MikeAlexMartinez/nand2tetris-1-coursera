@@ -33,6 +33,12 @@ class Grid {
     return;
   }
 
+  /* clear contents of grid */
+  method void clearGrid() {
+    do drawHorizontal(0, 16, 9, 22, 16*14); // clear contents
+    return;
+  }
+
   /**
    * returns int that represents whether snake will encounter
    * an object when completing next move.

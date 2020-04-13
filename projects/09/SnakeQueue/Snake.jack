@@ -9,15 +9,14 @@ class Snake {
   field Queue snake;
   field Grid grid;
 
-  constructor Snake new() {
+  constructor Snake new(Grid newGrid) {
+    let grid = newGrid;
     let snake = Queue.new(22*14);
-    let grid = Grid.new();
     do buildSnake();
     return this;
   }
 
   method void dispose() {
-    do grid.dispose();
     do snake.dispose();
     do Memory.deAlloc(this);
     return;

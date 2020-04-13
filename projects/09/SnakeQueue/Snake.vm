@@ -2,13 +2,13 @@ function Snake.new 0
 push constant 3
 call Memory.alloc 1
 pop pointer 0
+push argument 0
+pop this 2
 push constant 22
 push constant 14
 call Math.multiply 2
 call Queue.new 1
 pop this 1
-call Grid.new 0
-pop this 2
 push pointer 0
 call Snake.buildSnake 1
 pop temp 0
@@ -17,9 +17,6 @@ return
 function Snake.dispose 0
 push argument 0
 pop pointer 0
-push this 2
-call Grid.dispose 1
-pop temp 0
 push this 1
 call Queue.dispose 1
 pop temp 0
