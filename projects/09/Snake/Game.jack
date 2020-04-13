@@ -1,5 +1,4 @@
 class Game {
-
   field Snake snake;
   field Scoreboard score;
   field Grid grid;
@@ -74,7 +73,7 @@ class Game {
    * Change direction
    * 1 = up, 2 = down, 3 = left, 4 = right
    *
-   * won't change direction if newDirection is
+   * Won't change direction if newDirection is
    * inverse of current direction
    */
   method void updateDirection(int newDirection) {
