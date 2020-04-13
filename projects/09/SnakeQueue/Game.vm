@@ -155,10 +155,6 @@ push this 0
 push this 2
 call Snake.move 2
 pop local 1
-push this 1
-push local 1
-call Scoreboard.setState 2
-pop temp 0
 push local 1
 push constant 2
 eq

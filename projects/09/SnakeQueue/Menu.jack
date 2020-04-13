@@ -63,7 +63,7 @@ class Menu {
       // Oops
       do Output.moveCursor(5, 30);
       do Output.printString("Oops, you crashed!");
-      
+
       // Still Hungry
       do Output.moveCursor(7, 24);
       do Output.printString("Cornflake is still hungry!");
@@ -78,9 +78,9 @@ class Menu {
     do Output.printString("Press b to ");
 
     if (played) {
-      do Output.printString("Restart!")
+      do Output.printString("Restart!");
     } else {
-      do Output.printString("Begin!")
+      do Output.printString("Begin!");
     }
 
     // Set Speed Instructions
