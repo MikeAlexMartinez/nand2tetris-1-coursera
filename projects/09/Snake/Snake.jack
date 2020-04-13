@@ -3,27 +3,89 @@
 class Snake {
 
   field Grid grid;
-  field Array head;     // tracks the position on the grid of the head
-  field Array tail;     // tracks the position on the grid of the snake
-  field char direction; // the current direction of the snake
+  field Array head;    // tracks the position on the grid of the head [col, row]
+  field Array tail;    // tracks the position on the grid of the snake [col, row]
+  field int direction; // the current direction of the snake
 
   constructor Snake new() {
     let grid = Grid.new();
+    let head = Array.new(2);
+    let tail = Array.new(2);
+    do setHead(9, 7);
+    do setTail(5, 7);
+    let tail = Array.new(2);
     let direction = 4;
     return this;
-  }
-
-  /**
-   * Change direction
-   * 1 = up, 2 = down, 3 = left, 4 = right
-   *
-  method void updateDirection(int direction) {
-    return;
   }
 
   method void dispose() {
     do grid.dispose();
     do Memory.deAlloc(this);
     return;
+  }
+
+  method void setHead(int col, int row) {
+    let head[0] = col;
+    let head[1] = row;
+    return;
+  }
+
+  method void setTail(int col, int row) {
+    let tail[0] = col;
+    let tail[1] = row;
+    return;
+  }
+
+  /**
+   * Change direction
+   * 1 = up, 2 = down, 3 = left, 4 = right
+   *
+   * won't change direction if newDirection is
+   * inverse of current direction
+   */
+  method void updateDirection(int newDirection) {
+    if (~(direction = newDirection) &
+      (
+        ~(direction = 1 & newDirection = 2) &
+        ~(newDirection = 1 & direction = 2) &
+        ~(direction = 3 & newDirection = 4) &
+        ~(newDirection = 4 & direction = 3)
+      )
+    ) {
+      let direction = newDirection;
+    }
+    return;
+  }
+
+  method int move() {
+    var int collision;
+
+    if (direction = 1) {
+      // move up
+      let head[0] = head[0] - 1;
+    }
+
+    if (direction = 2) {
+      // move down
+      let head[0] = head[0] + 1;
+    }
+
+    if (direction = 3) {
+      // move left
+      let head[1] = head[1] - 1;
+    }
+
+    if (direction = 4) {
+      // move right
+      let head[1] = head[1] + 1;
+    }
+
+    let collision = grid.detectCollision(head);
+
+    if (collision = 0 | collision = 3) {
+      do grid.updateSnake(head, tail);
+    }
+
+    return collision;
   }
 }

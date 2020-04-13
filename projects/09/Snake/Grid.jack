@@ -11,6 +11,7 @@ class Grid {
 
   constructor Grid new() {
     do drawGrid();
+    do drawSnake();
     return this;
   }
 
@@ -20,16 +21,16 @@ class Grid {
   }
 
   method void drawGrid() {
-    do drawVertical(-128, 8); // Left side
-    do drawVertical(127, 31); // right side
-    do drawHorizontal(-1, 8, 9, 21); // top side
-    do drawHorizontal(-1, 239, 9, 21); // bottom side
+    do drawVertical(-1, 8); // Left side
+    do drawVertical(-1, 31); // right side
+    do drawHorizontal(-1, 0, 9, 21, 16); // top side
+    do drawHorizontal(-1, 239, 9, 21, 16); // bottom side
     return;
   }
 
   /* starts snake as 5 blocks of 8 by 8 pixels */
   method void drawSnake() {
-    do drawHorizontal(-1, 112, 14, 5); // Snake Start
+    do drawHorizontal(-1, 112, 14, 5, 16); // Snake Start
     return;
   }
 
@@ -41,7 +42,7 @@ class Grid {
    * 2 = wall
    * 3 = food
    */
-  method int detectCollision(int col, int row) {
+  method int detectCollision(Array head) {
     var int collision;
 
     let collision = 0;
@@ -55,13 +56,42 @@ class Grid {
     return collision;
   }
 
-  method void drawFood() {
-    // generate location using randRange
-
-    // if selected range has snake, regen
-
-    // drawFood
+  method void updateSnake(Array head, Array tail) {
     return;
+  }
+
+  method void setFood() {
+    var int col, row;
+    var boolean hasSnake;
+    var boolean foodDrawn;
+
+    let foodDrawn = false;
+    let hasSnake = false;
+    while(~(foodDrawn)) {
+      // generate location using randRange
+      let col = LCGRandom.randRange(0, 19);
+      let row = LCGRandom.randRange(0, 13);
+      // if selected range has snake, regen
+      let hasSnake = cellHasSnake(col, row);
+      // drawFood
+      if (~hasSnake) {
+        do drawFood(col, row);
+      }
+    }
+    return;
+  }
+
+  method boolean cellHasSnake(int col, int row) {
+    var int memAddress, val;
+    let row = row + 16;
+    let col = col + 9;
+    let memAddress = 16384 + col + (32 * row) - 1;
+    let val = Memory.peek(memAddress);
+    return (val = -1)
+  }
+
+  method void drawFood(int col, int row) {
+
   }
 
   /* draw the sides of the snake container */
@@ -70,8 +100,8 @@ class Grid {
     var int increment, diff;
 
     let memAddress = 16384 + column;
-    let start = 8;
-    let end = 247;
+    let start = 0;
+    let end = 255;
     let increment = 32;
     let diff = start * increment;
 
@@ -84,13 +114,13 @@ class Grid {
     return;
   }
 
-  method void drawHorizontal(int value, int row, int colStart, int cols) {
+  method void drawHorizontal(int value, int row, int colStart, int cols, int height) {
     var int memAddress; // active memory address
     var int start, end; // number of rows
     var int col, colEnd; // number of columns
 
     let start = row;
-    let end = start + 8;
+    let end = start + height;
     let col = colStart;
     let colEnd = col + cols;
 
