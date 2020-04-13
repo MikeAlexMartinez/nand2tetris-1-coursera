@@ -4,25 +4,9 @@ call Memory.alloc 1
 pop pointer 0
 call Grid.new 0
 pop this 0
-push constant 2
-call Array.new 1
-pop this 1
-push constant 2
-call Array.new 1
-pop this 2
 push pointer 0
-push constant 18
-push constant 7
-call Snake.setHead 3
+call Snake.createSnake 1
 pop temp 0
-push pointer 0
-push constant 14
-push constant 7
-call Snake.setTail 3
-pop temp 0
-push constant 2
-call Array.new 1
-pop this 2
 push argument 0
 pop this 3
 push pointer 0
@@ -33,51 +17,103 @@ pop pointer 0
 push this 0
 call Grid.dispose 1
 pop temp 0
+push this 2
+call Queue.dispose 1
+pop temp 0
+push this 1
+call Array.dispose 1
+pop temp 0
 push pointer 0
 call Memory.deAlloc 1
 pop temp 0
 push constant 0
 return
-function Snake.setHead 0
+function Snake.createSnake 3
 push argument 0
 pop pointer 0
+push constant 22
+push constant 14
+call Math.multiply 2
+call Queue.new 1
+pop this 2
+push constant 15
+pop local 0
+push constant 19
+pop local 1
+label WHILE_EXP0
+push local 0
+push local 1
+gt
+not
+not
+if-goto WHILE_END0
+push constant 2
+call Array.new 1
+pop local 2
 push constant 0
-push this 1
+push local 2
 add
-push argument 1
+push local 0
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
 push constant 1
-push this 1
+push local 2
 add
-push argument 2
+push constant 7
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push pointer 0
+push local 2
+push constant 0
+call Snake.updateHead 3
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push local 2
+pop this 1
 push constant 0
 return
-function Snake.setTail 0
+function Snake.updateHead 0
 push argument 0
 pop pointer 0
-push constant 0
 push this 2
-add
 push argument 1
+call Queue.pushHead 2
 pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
-push constant 1
-push this 2
-add
+push this 0
+push argument 1
+call Grid.updateHead 2
+pop temp 0
 push argument 2
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 1
+pop this 1
+label IF_FALSE0
+push constant 0
+return
+function Snake.updateTail 1
+push argument 0
+pop pointer 0
+push this 2
+call Queue.takeTail 1
+pop local 0
+push this 0
+push local 0
+call Grid.updateTail 2
 pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
+push local 0
+call Array.dispose 1
+pop temp 0
 push constant 0
 return
 function Snake.updateDirection 0
@@ -131,17 +167,32 @@ pop this 3
 label IF_FALSE0
 push constant 0
 return
-function Snake.move 1
+function Snake.move 2
 push argument 0
 pop pointer 0
+push constant 2
+call Array.new 1
+pop local 1
 push this 3
 push constant 1
 eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 1
+push constant 0
+push local 1
+add
+push constant 0
 push this 1
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 1
 add
 push constant 1
 push this 1
@@ -161,8 +212,20 @@ eq
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
-push constant 1
+push constant 0
+push local 1
+add
+push constant 0
 push this 1
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 1
 add
 push constant 1
 push this 1
@@ -183,7 +246,7 @@ if-goto IF_TRUE2
 goto IF_FALSE2
 label IF_TRUE2
 push constant 0
-push this 1
+push local 1
 add
 push constant 0
 push this 1
@@ -196,6 +259,18 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push constant 1
+push local 1
+add
+push constant 1
+push this 1
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
 label IF_FALSE2
 push this 3
 push constant 4
@@ -204,7 +279,7 @@ if-goto IF_TRUE3
 goto IF_FALSE3
 label IF_TRUE3
 push constant 0
-push this 1
+push local 1
 add
 push constant 0
 push this 1
@@ -213,6 +288,18 @@ pop pointer 1
 push that 0
 push constant 1
 add
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 1
+add
+push constant 1
+push this 1
+add
+pop pointer 1
+push that 0
 pop temp 0
 pop pointer 1
 push temp 0
@@ -228,13 +315,14 @@ eq
 if-goto IF_TRUE4
 goto IF_FALSE4
 label IF_TRUE4
-push this 0
-push this 1
-call Grid.updateHead 2
+push pointer 0
+push local 1
+push constant 0
+not
+call Snake.updateHead 3
 pop temp 0
-push this 0
-push this 2
-call Grid.updateTail 2
+push pointer 0
+call Snake.updateTail 1
 pop temp 0
 goto IF_END4
 label IF_FALSE4
@@ -244,9 +332,11 @@ eq
 if-goto IF_TRUE5
 goto IF_FALSE5
 label IF_TRUE5
-push this 0
-push this 1
-call Grid.updateHead 2
+push pointer 0
+push local 1
+push constant 0
+not
+call Snake.updateHead 3
 pop temp 0
 push this 0
 call Grid.setFood 1

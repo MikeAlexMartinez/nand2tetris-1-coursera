@@ -6,9 +6,6 @@ push pointer 0
 call Grid.drawGrid 1
 pop temp 0
 push pointer 0
-call Grid.drawSnake 1
-pop temp 0
-push pointer 0
 call Grid.setFood 1
 pop temp 0
 push pointer 0
@@ -51,20 +48,6 @@ neg
 push constant 240
 push constant 9
 push constant 22
-push constant 16
-call Grid.drawHorizontal 6
-pop temp 0
-push constant 0
-return
-function Grid.drawSnake 0
-push argument 0
-pop pointer 0
-push pointer 0
-push constant 1
-neg
-push constant 112
-push constant 14
-push constant 5
 push constant 16
 call Grid.drawHorizontal 6
 pop temp 0

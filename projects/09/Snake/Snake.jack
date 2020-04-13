@@ -4,35 +4,60 @@ class Snake {
 
   field Grid grid;
   field Array head;    // tracks the position on the grid of the head [col, row]
-  field Array body;    // Array containing the body of the snake
+  field Queue snake;    // Array containing the body of the snake
   field int direction; // the current direction of the snake
 
   constructor Snake new(int dir) {
     let grid = Grid.new();
-    let head = Array.new(2);
-    let tail = Array.new(2);
-    do setHead(18, 7);
-    do setTail(13, 7);
-    let tail = Array.new(2);
+    do createSnake();
     let direction = dir;
     return this;
   }
 
   method void dispose() {
     do grid.dispose();
+    do snake.dispose();
+    do head.dispose();
     do Memory.deAlloc(this);
     return;
   }
 
-  method void setHead(int col, int row) {
-    let head[0] = col;
-    let head[1] = row;
+  method void createSnake() {
+    var int startCol, endCol;
+    var Array snakeSegment;
+
+    // Create snake and take memory for max length
+    // of snake
+    let snake = Queue.new(22*14);
+
+    let startCol = 15;
+    let endCol = 19;
+    while(~(startCol > endCol)) {
+      let snakeSegment = Array.new(2);
+      let snakeSegment[0] = startCol;
+      let snakeSegment[1] = 7;
+      do updateHead(snakeSegment, false);
+      let startCol = startCol + 1;
+    }
+
+    let head = snakeSegment;
     return;
   }
 
-  method void setTail(int col, int row) {
-    let tail[0] = col;
-    let tail[1] = row;
+  method void updateHead(Array newHead, bool update) {
+    do snake.pushHead(newHead);
+    do grid.updateHead(newHead);
+    if (update) {
+      let head = newHead;
+    }
+    return;
+  }
+
+  method void updateTail() {
+    var Array tail; 
+    let tail = snake.takeTail();
+    do grid.updateTail(tail);
+    do tail.dispose();
     return;
   }
 
@@ -59,37 +84,45 @@ class Snake {
 
   method int move() {
     var int collision;
+    var Array newHead;
+
+    let newHead = Array.new(2);
 
     if (direction = 1) {
       // move up
-      let head[1] = head[1] - 1;
+      let newHead[0] = head[0];
+      let newHead[1] = head[1] - 1;
     }
 
     if (direction = 2) {
       // move down
-      let head[1] = head[1] + 1;
+      let newHead[0] = head[0];
+      let newHead[1] = head[1] + 1;
     }
 
     if (direction = 3) {
       // move left
-      let head[0] = head[0] - 1;
+      let newHead[0] = head[0] - 1;
+      let newHead[1] = head[1];
     }
 
     if (direction = 4) {
       // move right
-      let head[0] = head[0] + 1;
+      let newHead[0] = head[0] + 1;
+      let newHead[1] = head[1];
     }
 
     let collision = grid.detectCollision(head);
 
     if (collision = 0) {
-      // nothing has happened, move head and tail
-      do grid.updateHead(head);
-      do grid.updateTail(tail);
+      // nothing interesting has happened, move head and tail
+      do updateHead(newHead, true);
+      do updateTail();
     } else {
       if (collision = 3) {
         // move head
-        do grid.updateHead(head);
+        do updateHead(newHead, true);
+
         // don't need to move tail as snake
         // gets longer
 
