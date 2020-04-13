@@ -1,5 +1,7 @@
 
 /**
+ *  This graphical class is responsible for updating the grid
+ *  of the game.
  *  accessible grid for snake consists of 16x16px blocks.
  *  These blocks are 14 rows high (rows 1 to 14)
  *  And 22 rows across (columns 9 to 30)
@@ -21,11 +23,19 @@ class Grid {
     return;
   }
 
+  /* draw outline of grid and clear menu from centre */
   method void drawGrid() {
     do drawVertical(-1, 8); // Left side
     do drawVertical(-1, 31); // right side
     do drawHorizontal(-1, 0, 9, 22, 16); // top side
     do drawHorizontal(-1, 240, 9, 22, 16); // bottom side
+    do drawHorizontal(0, 16, 9, 22, 16*14); // clear contents
+    return;
+  }
+
+  /* clear contents of grid */
+  method void clearGrid() {
+    do drawHorizontal(0, 16, 9, 22, 16*14); // clear contents
     return;
   }
 
@@ -45,11 +55,11 @@ class Grid {
     let col = head[0];
     let row = head[1];
 
-    // if col or row outside boundary return 2
-    if ((col < 9)
-      | (col > 30)
-      | (row < 1)
-      | (row > 14)
+    // if col or row outside grid boundary return 2
+    if ((col = 8)
+      | (col = 31)
+      | (row = 0)
+      | (row = 15)
     ) {
       let collision = 2;
     } else { // Still in Grid
@@ -67,16 +77,26 @@ class Grid {
     return collision;
   }
 
+  /**
+   * Draws the next position of the snakes head
+   */
   method void updateHead(Array head) {
     do updateBlock(head[0], head[1], -1);
     return;
   }
 
+  /**
+   * This functions clears the block where the tail
+   * Is currently
+   */
   method void updateTail(Array tail) {
     do updateBlock(tail[0], tail[1], 0);
     return;
   }
 
+  /**
+   * Updates all rows of target block with value provided
+   */
   method void updateBlock(int col, int row, int val) {
     var int memAddress;
     let row = row * 16 * 32;
@@ -101,6 +121,10 @@ class Grid {
     return;
   }
 
+  /**
+   * randomly generate a piece of food
+   * and add to grid.
+   */
   method void setFood() {
     var int col, row;
     var boolean hasSnake;
@@ -112,9 +136,9 @@ class Grid {
       // generate location using randRange
       let col = LCGRandom.randRange(9, 30);
       let row = LCGRandom.randRange(1, 14);
-      // if selected range has snake, regen
+      // if selected range has snake, regenerate
       let hasSnake = cellHasSnake(col, row);
-      // drawFood
+      // drawFood if block is snake free
       if (~(hasSnake)) {
         do drawFood(col, row);
         let foodDrawn = true;
@@ -123,18 +147,27 @@ class Grid {
     return;
   }
 
+  /** 
+   * check if first row of block has a value which
+   * matches that of a piece of food
+   */
   method boolean cellHasFood(int col, int row) {
     var int val;
     let val = peekAtBlock(col, row);
     return (val = 6168);
   }
 
+  /** 
+   * check if first row of block has a value which
+   * matches that of a snake
+   */
   method boolean cellHasSnake(int col, int row) {
     var int val;
     let val = peekAtBlock(col, row);
     return (val = -1);
   }
 
+  /* check the current value in the target block */
   method int peekAtBlock(int col, int row) {
     var int memAddress, val;
     let row = row * 16 * 32;
@@ -143,6 +176,7 @@ class Grid {
     return Memory.peek(memAddress);
   }
 
+  /* Draws the next piece of food in the required location */
   method void drawFood(int col, int row) {
     var int memAddress;
     let memAddress = 16384 + col + (row * 16 * 32);
@@ -185,6 +219,7 @@ class Grid {
     return;
   }
 
+  /* Draws the top and bottom edges of the grid */
   method void drawHorizontal(int value, int row, int colStart, int cols, int height) {
     var int memAddress; // active memory address
     var int start, end; // number of rows

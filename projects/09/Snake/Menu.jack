@@ -4,16 +4,16 @@ class Menu {
   field int speed;
   field Scoreboard board;
 
-  constructor Menu new() {
+  constructor Menu new(Scoreboard sboard) {
     let speed = 1;
-    let board = Scoreboard.new(speed);
+    let board = sboard;
     return this;
   }
 
-  method Scoreboard show(bool played) {
+  method int show(bool played) {
     var boolean begin;
     var char key;
-    
+
     do displayMenu(played);
     while(~begin) {
       while(key = 0) {
@@ -46,11 +46,11 @@ class Menu {
       }
     }
 
-    return board;
+    return speed;
   }
 
   method void displayMenu(bool played) {
-    if (played) {
+    if (~played) {
       // Welcome
       do Output.moveCursor(5, 30);
       do Output.printString("Welcome to SNAKE");
@@ -58,14 +58,13 @@ class Menu {
       // Meet snake
       do Output.moveCursor(7, 24);
       do Output.printString("Meet cornflake the veggie snake!");
-
     } else {
       // Oops
       do Output.moveCursor(5, 30);
       do Output.printString("Oops, you crashed!");
 
       // Still Hungry
-      do Output.moveCursor(7, 24);
+      do Output.moveCursor(7, 28);
       do Output.printString("Cornflake is still hungry!");
     }
 
@@ -77,10 +76,10 @@ class Menu {
     do Output.moveCursor(11, 30);
     do Output.printString("Press b to ");
 
-    if (played) {
-      do Output.printString("Restart!");
-    } else {
+    if (~played) {
       do Output.printString("Begin!");
+    } else {
+      do Output.printString("Restart!");
     }
 
     // Set Speed Instructions

@@ -7,12 +7,19 @@
 class Scoreboard {
 
   field int score; // tracks user score
+  field int speed; // tracks game speed
 
-  constructor Scoreboard new() {
+  constructor Scoreboard new(int gameSpeed) {
     let score = 0;
 
+    if (gameSpeed = 0) {
+      let speed = 1;
+    } else {
+      let speed = gameSpeed;
+    }
+
     do setHeading();
-    do setScore();
+    do setScore(0);
     do setSpeed();
 
     return this;
@@ -31,10 +38,11 @@ class Scoreboard {
   }
 
   /* Add current score */
-  method void setScore() {
+  method void setScore(int startScore) {
+    let score = startScore;
     do Output.moveCursor(3, 1);
     do Output.printString("CURRENT SCORE:");
-    do updateScore(0);
+    do updateScore(startScore);
     return;
   }
 
@@ -43,6 +51,7 @@ class Scoreboard {
     let score = score + points;
     do Output.moveCursor(4, 1);
     do Output.printInt(score);
+    do Output.printString("     ");
     return;
   }
 
@@ -50,23 +59,21 @@ class Scoreboard {
   method void setSpeed() {
     do Output.moveCursor(7, 1);
     do Output.printString("SPEED: ");
-    do updateSpeed(10);
+    do updateSpeed(speed);
     return;
   }
 
   /* Update speed of the game on the scoreboard */
   method void updateSpeed(int newSpeed) {
+    let speed = newSpeed;
     do Output.moveCursor(7, 8);
     do Output.printInt(newSpeed);
+    do Output.printString(" ");
     return;
   }
 
-  /* Display Game State */
-  method void setState(int state) {
-    do Output.moveCursor(10, 1);
-    do Output.printString("State: ");
-    do Output.printInt(state);
-    return;
+  method int getSpeed() {
+    return speed;
   }
 
   /* show direction */
@@ -74,6 +81,27 @@ class Scoreboard {
     do Output.moveCursor(12, 1);
     do Output.printString("Direction: ");
     do Output.printInt(direction);
+    return;
+  }
+
+  /* show message */
+  method void showMessage(String message) {
+    do Output.moveCursor(14, 1);
+    do Output.printString(message);
+    return;
+  }
+
+  /* clear message */
+  method void clearMessage() {
+    do Output.moveCursor(14, 1);
+    do Output.printString("               ");
+    return;
+  }
+
+  /* Game over! */
+  method void gameOver() {
+    do Output.moveCursor(14, 1);
+    do Output.printString("GAME OVER!");
     return;
   }
 }

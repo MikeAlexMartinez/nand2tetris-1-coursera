@@ -1,34 +1,30 @@
-
-
+/**
+ * Snake is reponsible for tracking the position of the
+ * snakes head and uses the Queue data structure to 
+ * keep track of the position of the snakes tail.
+ */
 class Snake {
 
+  field Array head;
+  field Queue snake;
   field Grid grid;
-  field Array head;    // tracks the position on the grid of the head [col, row]
-  field Queue snake;    // Array containing the body of the snake
-  field int direction; // the current direction of the snake
 
-  constructor Snake new(int dir) {
-    let grid = Grid.new();
-    do createSnake();
-    let direction = dir;
+  constructor Snake new(Grid newGrid) {
+    let grid = newGrid;
+    let snake = Queue.new(22*14);
+    do buildSnake();
     return this;
   }
 
   method void dispose() {
-    do grid.dispose();
     do snake.dispose();
-    do head.dispose();
     do Memory.deAlloc(this);
     return;
   }
 
-  method void createSnake() {
+  method void buildSnake() {
     var int startCol, endCol;
     var Array snakeSegment;
-
-    // Create snake and take memory for max length
-    // of snake
-    let snake = Queue.new(22*14);
 
     let startCol = 15;
     let endCol = 19;
@@ -57,43 +53,23 @@ class Snake {
     return;
   }
 
-  /**
-   * Change direction
-   * 1 = up, 2 = down, 3 = left, 4 = right
-   *
-   * won't change direction if newDirection is
-   * inverse of current direction
-   */
-  method void updateDirection(int newDirection) {
-    if (~(direction = newDirection) &
-      (
-        ~(direction = 1 & newDirection = 2) &
-        ~(newDirection = 1 & direction = 2) &
-        ~(direction = 3 & newDirection = 4) &
-        ~(newDirection = 4 & direction = 3)
-      )
-    ) {
-      let direction = newDirection;
-    }
-    return;
-  }
-
-  method int move() {
+  method int move(int direction) {
     var int collision;
     var Array newHead;
+    let collision = 0;
 
     let newHead = Array.new(2);
 
     if (direction = 1) {
       // move up
       let newHead[0] = head[0];
-      let newHead[1] = head[1] + 1;
+      let newHead[1] = head[1] - 1;
     }
 
     if (direction = 2) {
       // move down
       let newHead[0] = head[0];
-      let newHead[1] = head[1] - 1;
+      let newHead[1] = head[1] + 1;
     }
 
     if (direction = 3) {
@@ -108,26 +84,25 @@ class Snake {
       let newHead[1] = head[1];
     }
 
-    let collision = grid.detectCollision(head);
-
+    let collision = grid.detectCollision(newHead);
     if (collision = 0) {
       // nothing interesting has happened, move head and tail
       do updateHead(newHead);
       do updateTail();
-    } else {
-      if (collision = 3) {
-        // move head
-        do updateHead(newHead);
-
-        // don't need to move tail as snake
-        // gets longer
-
-        // add new food
-        do grid.setFood();
-      }
     }
 
-    do Sys.wait(5000);
-    return collision;
+    if (collision = 3) {
+      // move head
+      do updateHead(newHead);
+
+      // don't need to move tail as snake
+      // gets longer
+
+      // add new food
+      do grid.setFood();
+    }
+
+    return collision; 
   }
+
 }
