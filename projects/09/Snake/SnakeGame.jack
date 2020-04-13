@@ -11,6 +11,7 @@ class SnakeGame {
 
   constructor SnakeGame new() {
     do Screen.clearScreen();
+    do LCGRandom.setSeed(10);
 
     let speed = 10;
     let scoreboard = Scoreboard.new();
@@ -21,13 +22,15 @@ class SnakeGame {
   method void run() {
     var char key; // key currently pressed by user
     var boolean exit;
-    let snake = Snake.new();
+    var int collision;
+    let snake = Snake.new(4); // set direction to right
     let exit = false;
 
     while(~exit) {
       while (key = 0) {
         let key = Keyboard.keyPressed();
-        do snake.move();
+        let collision = snake.move();
+        do scoreboard.showState(collision);
       }
 
       if (key = 131) { do snake.updateDirection(1); }   // up arrow
@@ -38,7 +41,8 @@ class SnakeGame {
       // waits for the key to be released
       while (~(key = 0)) {
         let key = Keyboard.keyPressed();
-        do snake.move();
+        let collision = snake.move();
+        do scoreboard.showState(collision);
       }
     }
 

@@ -11,19 +11,19 @@ push constant 2
 call Array.new 1
 pop this 2
 push pointer 0
-push constant 9
+push constant 18
 push constant 7
 call Snake.setHead 3
 pop temp 0
 push pointer 0
-push constant 5
+push constant 14
 push constant 7
 call Snake.setTail 3
 pop temp 0
 push constant 2
 call Array.new 1
 pop this 2
-push constant 4
+push argument 0
 pop this 3
 push pointer 0
 return
@@ -140,10 +140,10 @@ eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 0
+push constant 1
 push this 1
 add
-push constant 0
+push constant 1
 push this 1
 add
 pop pointer 1
@@ -161,10 +161,10 @@ eq
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
-push constant 0
+push constant 1
 push this 1
 add
-push constant 0
+push constant 1
 push this 1
 add
 pop pointer 1
@@ -182,10 +182,10 @@ eq
 if-goto IF_TRUE2
 goto IF_FALSE2
 label IF_TRUE2
-push constant 1
+push constant 0
 push this 1
 add
-push constant 1
+push constant 0
 push this 1
 add
 pop pointer 1
@@ -203,10 +203,10 @@ eq
 if-goto IF_TRUE3
 goto IF_FALSE3
 label IF_TRUE3
-push constant 1
+push constant 0
 push this 1
 add
-push constant 1
+push constant 0
 push this 1
 add
 pop pointer 1
@@ -225,18 +225,36 @@ pop local 0
 push local 0
 push constant 0
 eq
-push local 0
-or
-push constant 3
-eq
 if-goto IF_TRUE4
 goto IF_FALSE4
 label IF_TRUE4
 push this 0
 push this 1
-push this 2
-call Grid.updateSnake 3
+call Grid.updateHead 2
 pop temp 0
+push this 0
+push this 2
+call Grid.updateTail 2
+pop temp 0
+goto IF_END4
 label IF_FALSE4
+push local 0
+push constant 3
+eq
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push this 0
+push this 1
+call Grid.updateHead 2
+pop temp 0
+push this 0
+call Grid.setFood 1
+pop temp 0
+label IF_FALSE5
+label IF_END4
+push constant 5000
+call Sys.wait 1
+pop temp 0
 push local 0
 return

@@ -5,15 +5,19 @@ pop pointer 0
 call Screen.clearScreen 0
 pop temp 0
 push constant 10
+call LCGRandom.setSeed 1
+pop temp 0
+push constant 10
 pop this 2
 call Scoreboard.new 0
 pop this 1
 push pointer 0
 return
-function SnakeGame.run 2
+function SnakeGame.run 3
 push argument 0
 pop pointer 0
-call Snake.new 0
+push constant 4
+call Snake.new 1
 pop this 0
 push constant 0
 pop local 1
@@ -32,6 +36,10 @@ call Keyboard.keyPressed 0
 pop local 0
 push this 0
 call Snake.move 1
+pop local 2
+push this 1
+push local 2
+call Scoreboard.showState 2
 pop temp 0
 goto WHILE_EXP1
 label WHILE_END1
@@ -90,6 +98,10 @@ call Keyboard.keyPressed 0
 pop local 0
 push this 0
 call Snake.move 1
+pop local 2
+push this 1
+push local 2
+call Scoreboard.showState 2
 pop temp 0
 goto WHILE_EXP2
 label WHILE_END2

@@ -60,4 +60,11 @@ class Scoreboard {
     do Output.printInt(newSpeed);
     return;
   }
+
+  /* Display Game State */
+  method void showState(int state) {
+    do Output.moveCursor(10, 1);
+    do Output.printInt(state);
+    return;
+  }
 }

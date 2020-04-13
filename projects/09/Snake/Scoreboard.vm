@@ -150,3 +150,15 @@ call Output.printInt 1
 pop temp 0
 push constant 0
 return
+function Scoreboard.showState 0
+push argument 0
+pop pointer 0
+push constant 10
+push constant 1
+call Output.moveCursor 2
+pop temp 0
+push argument 1
+call Output.printInt 1
+pop temp 0
+push constant 0
+return

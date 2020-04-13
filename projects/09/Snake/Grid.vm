@@ -9,6 +9,9 @@ push pointer 0
 call Grid.drawSnake 1
 pop temp 0
 push pointer 0
+call Grid.setFood 1
+pop temp 0
+push pointer 0
 return
 function Grid.dispose 0
 push argument 0
@@ -38,16 +41,16 @@ push constant 1
 neg
 push constant 0
 push constant 9
-push constant 21
+push constant 22
 push constant 16
 call Grid.drawHorizontal 6
 pop temp 0
 push pointer 0
 push constant 1
 neg
-push constant 239
+push constant 240
 push constant 9
-push constant 21
+push constant 22
 push constant 16
 call Grid.drawHorizontal 6
 pop temp 0
@@ -67,21 +70,425 @@ call Grid.drawHorizontal 6
 pop temp 0
 push constant 0
 return
-function Grid.detectCollision 1
+function Grid.detectCollision 5
 push argument 0
 pop pointer 0
 push constant 0
 pop local 0
+push constant 0
+push argument 1
+add
+pop pointer 1
+push that 0
+pop local 1
+push constant 1
+push argument 1
+add
+pop pointer 1
+push that 0
+pop local 2
+push local 1
+push constant 9
+lt
+push local 1
+push constant 30
+gt
+or
+push local 2
+push constant 1
+lt
+or
+push local 2
+push constant 14
+gt
+or
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 2
+pop local 0
+goto IF_END0
+label IF_FALSE0
+push pointer 0
+push local 1
+push local 2
+call Grid.cellHasSnake 3
+pop local 3
+push local 3
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 1
+pop local 0
+goto IF_END1
+label IF_FALSE1
+push pointer 0
+push local 1
+push local 2
+call Grid.cellHasFood 3
+pop local 4
+push local 4
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push constant 3
+pop local 0
+label IF_FALSE2
+label IF_END1
+label IF_END0
 push local 0
 return
-function Grid.updateSnake 0
+function Grid.updateHead 0
+push argument 0
+pop pointer 0
+push pointer 0
+push constant 0
+push argument 1
+add
+pop pointer 1
+push that 0
+push constant 1
+push argument 1
+add
+pop pointer 1
+push that 0
+push constant 1
+neg
+call Grid.updateBlock 4
+pop temp 0
+push constant 0
+return
+function Grid.updateTail 0
+push argument 0
+pop pointer 0
+push pointer 0
+push constant 0
+push argument 1
+add
+pop pointer 1
+push that 0
+push constant 1
+push argument 1
+add
+pop pointer 1
+push that 0
+push constant 0
+call Grid.updateBlock 4
+pop temp 0
+push constant 0
+return
+function Grid.updateBlock 1
+push argument 0
+pop pointer 0
+push argument 2
+push constant 16
+call Math.multiply 2
+push constant 32
+call Math.multiply 2
+pop argument 2
+push argument 1
+pop argument 1
+push constant 16384
+push argument 1
+add
+push argument 2
+add
+pop local 0
+push local 0
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 32
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 64
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 96
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 128
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 160
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 192
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 224
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 256
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 288
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 448
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 480
+add
+push argument 3
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Grid.setFood 4
 push argument 0
 pop pointer 0
 push constant 0
+pop local 3
+push constant 0
+pop local 2
+label WHILE_EXP0
+push local 3
+not
+not
+if-goto WHILE_END0
+push constant 9
+push constant 30
+call LCGRandom.randRange 2
+pop local 0
+push constant 1
+push constant 14
+call LCGRandom.randRange 2
+pop local 1
+push pointer 0
+push local 0
+push local 1
+call Grid.cellHasSnake 3
+pop local 2
+push local 2
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+push local 0
+push local 1
+call Grid.drawFood 3
+pop temp 0
+push constant 0
+not
+pop local 3
+label IF_FALSE0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
 return
-function Grid.drawFood 0
+function Grid.cellHasFood 1
 push argument 0
 pop pointer 0
+push pointer 0
+push argument 1
+push argument 2
+call Grid.peekAtBlock 3
+pop local 0
+push local 0
+push constant 6168
+eq
+return
+function Grid.cellHasSnake 1
+push argument 0
+pop pointer 0
+push pointer 0
+push argument 1
+push argument 2
+call Grid.peekAtBlock 3
+pop local 0
+push local 0
+push constant 1
+neg
+eq
+return
+function Grid.peekAtBlock 2
+push argument 0
+pop pointer 0
+push argument 2
+push constant 16
+call Math.multiply 2
+push constant 32
+call Math.multiply 2
+pop argument 2
+push argument 1
+pop argument 1
+push constant 16384
+push argument 1
+add
+push argument 2
+add
+pop local 0
+push local 0
+call Memory.peek 1
+return
+function Grid.drawFood 1
+push argument 0
+pop pointer 0
+push constant 16384
+push argument 1
+add
+push argument 2
+push constant 16
+call Math.multiply 2
+push constant 32
+call Math.multiply 2
+add
+pop local 0
+push local 0
+push constant 6168
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 32
+add
+push constant 9252
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 64
+add
+push constant 23130
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 96
+add
+push constant 23131
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 128
+add
+push constant 21931
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 160
+add
+push constant 21930
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 192
+add
+push constant 10836
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 224
+add
+push constant 5544
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 256
+add
+push constant 5544
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 288
+add
+push constant 10836
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 21930
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 21931
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 23131
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 23130
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 448
+add
+push constant 9252
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 480
+add
+push constant 6168
+call Memory.poke 2
+pop temp 0
 push constant 0
 return
 function Grid.drawVertical 5
@@ -144,7 +551,7 @@ pop local 4
 label WHILE_EXP0
 push local 1
 push local 2
-gt
+eq
 not
 not
 if-goto WHILE_END0
@@ -161,7 +568,7 @@ pop local 0
 label WHILE_EXP1
 push local 3
 push local 4
-gt
+eq
 not
 not
 if-goto WHILE_END1
