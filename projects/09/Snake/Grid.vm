@@ -51,6 +51,31 @@ push constant 22
 push constant 16
 call Grid.drawHorizontal 6
 pop temp 0
+push pointer 0
+push constant 0
+push constant 16
+push constant 9
+push constant 22
+push constant 16
+push constant 14
+call Math.multiply 2
+call Grid.drawHorizontal 6
+pop temp 0
+push constant 0
+return
+function Grid.clearGrid 0
+push argument 0
+pop pointer 0
+push pointer 0
+push constant 0
+push constant 16
+push constant 9
+push constant 22
+push constant 16
+push constant 14
+call Math.multiply 2
+call Grid.drawHorizontal 6
+pop temp 0
 push constant 0
 return
 function Grid.detectCollision 5
@@ -71,19 +96,19 @@ pop pointer 1
 push that 0
 pop local 2
 push local 1
-push constant 9
-lt
+push constant 8
+eq
 push local 1
-push constant 30
-gt
+push constant 31
+eq
 or
 push local 2
-push constant 1
-lt
+push constant 0
+eq
 or
 push local 2
-push constant 14
-gt
+push constant 15
+eq
 or
 if-goto IF_TRUE0
 goto IF_FALSE0
