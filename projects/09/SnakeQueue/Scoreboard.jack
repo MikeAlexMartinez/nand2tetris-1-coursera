@@ -74,14 +74,6 @@ class Scoreboard {
     return speed;
   }
 
-  /* Display Game State */
-  method void setState(int state) {
-    do Output.moveCursor(10, 1);
-    do Output.printString("State: ");
-    do Output.printInt(state);
-    return;
-  }
-
   /* show direction */
   method void updateDirection(int direction) {
     do Output.moveCursor(12, 1);

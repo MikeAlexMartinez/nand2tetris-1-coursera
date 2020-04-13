@@ -85,8 +85,6 @@ class Game {
     var int state;
 
     let state = snake.move(direction);
-    do score.setState(state);
-
     if ((state = 2) | (state = 1)) {
       do score.gameOver();
       let end = true;

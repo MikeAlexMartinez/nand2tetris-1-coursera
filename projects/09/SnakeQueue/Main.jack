@@ -4,17 +4,22 @@ class Main {
     var Scoreboard board;
     var Menu menu;
     var int speed;
+    var bool played;
 
     // Set up
     do LCGRandom.setSeed(10);
     let menu = Menu.new();
 
-    // show / process menu
-    let board = menu.show();
+    while() {
+      // show / process menu
+      let board = menu.show(played);
 
-    // run game
-    let game = Game.new(1, board);
-    do game.run();
+      // run game
+      let played = true;
+      let game = Game.new(1, board);
+      do game.run();
+      do game.dispose();
+    }
 
     return;
   }

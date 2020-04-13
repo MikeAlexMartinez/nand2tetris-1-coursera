@@ -10,11 +10,11 @@ class Menu {
     return this;
   }
 
-  method void show() {
+  method Scoreboard show(bool played) {
     var boolean begin;
     var char key;
     
-    do displayMenu();
+    do displayMenu(played);
     while(~begin) {
       while(key = 0) {
         let key = Keyboard.keyPressed();
@@ -46,17 +46,28 @@ class Menu {
       }
     }
 
-    return;
+    return board;
   }
 
-  method void displayMenu() {
-    // Welcome
-    do Output.moveCursor(5, 30);
-    do Output.printString("Welcome to SNAKE");
+  method void displayMenu(bool played) {
+    if (played) {
+      // Welcome
+      do Output.moveCursor(5, 30);
+      do Output.printString("Welcome to SNAKE");
 
-    // Meet snake
-    do Output.moveCursor(7, 24);
-    do Output.printString("Meet cornflake the veggie snake!");
+      // Meet snake
+      do Output.moveCursor(7, 24);
+      do Output.printString("Meet cornflake the veggie snake!");
+
+    } else {
+      // Oops
+      do Output.moveCursor(5, 30);
+      do Output.printString("Oops, you crashed!");
+      
+      // Still Hungry
+      do Output.moveCursor(7, 24);
+      do Output.printString("Cornflake is still hungry!");
+    }
 
     // Description
     do Output.moveCursor(9, 25);
@@ -64,7 +75,13 @@ class Menu {
 
     // Set being instructions
     do Output.moveCursor(11, 30);
-    do Output.printString("Press b to Begin!");
+    do Output.printString("Press b to ");
+
+    if (played) {
+      do Output.printString("Restart!")
+    } else {
+      do Output.printString("Begin!")
+    }
 
     // Set Speed Instructions
     do Output.moveCursor(13, 22);
