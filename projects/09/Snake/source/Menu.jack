@@ -1,4 +1,8 @@
-
+/**
+ * Tells the user what to do.
+ * Allows them to set the speed of the game.
+ * Also enables restarts
+ */
 class Menu {
 
   field int speed;
@@ -10,6 +14,7 @@ class Menu {
     return this;
   }
 
+  /* Display menu and listen for changes to speed or to begin */
   method int show(bool played) {
     var boolean begin;
     var char key;

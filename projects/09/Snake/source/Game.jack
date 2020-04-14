@@ -1,3 +1,8 @@
+/**
+ * This runs the game.
+ * Uses ticks instead of Sys.wait to listen to input
+ * to remain responsive.
+ */
 class Game {
   field Snake snake;
   field Scoreboard score;
@@ -92,6 +97,10 @@ class Game {
     return;
   }
 
+  /**
+   * State 2 or 1 means the snake crashed
+   * State 3 means the snake ate a flower
+   */
   method boolean move() {
     var boolean end;
     var int state;

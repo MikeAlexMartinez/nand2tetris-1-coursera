@@ -38,6 +38,7 @@ class Snake {
     return;
   }
 
+  /* Add new head of snake using snake queue */
   method void updateHead(Array newHead) {
     do snake.pushHead(newHead);
     do grid.updateHead(newHead);
@@ -45,6 +46,7 @@ class Snake {
     return;
   }
 
+  /* Removes tail from screen and game, freeing up memory */
   method void updateTail() {
     var Array tail; 
     let tail = snake.takeTail();
@@ -53,6 +55,7 @@ class Snake {
     return;
   }
 
+  /* calculates new head of snake and checks for collision */
   method int move(int direction) {
     var int collision;
     var Array newHead;
