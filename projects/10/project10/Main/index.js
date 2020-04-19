@@ -17,9 +17,11 @@ async function main(fileOrDirectory) {
     await files.forEach(async (fileName) => {
       if (/\.jack$/.test(fileName)) {
         const currentFilePath = path.resolve(fileOrDirectory, fileName);
-        const tokenize = tokenizer()
+        const t = tokenizer()
         const jackFile = await readFile(currentFilePath);
-        const tokens = tokenize(jackFile);
+        const tokens = t.tokenize(jackFile);
+        console.log(tokens)
+        
       }
     })
   } else {
