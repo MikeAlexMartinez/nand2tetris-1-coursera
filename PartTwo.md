@@ -1298,3 +1298,312 @@ Can use memory class to peek and poke to select an address and change it.
 Custom Drawing:
 - Render image by writing numbers into addresses. 
 
+## Week 4 - Compilers 1 - Syntax Analysis
+
+As mentioned, JACK and java use intermediate languages and use a two tier compilation
+system.
+
+Take home lessons:
+- Tokenizing
+- Grammars
+- Parsing
+- Parse Tress
+- XML / Mark up
+- Compilation
+- Handling data
+
+### Lexical Analysis
+
+Transforms a stream of characters into a stream of meaningful tokens.
+
+Removes white-space and comments.
+
+Five types of tokens:
+- Keywords - class constructor function method field static var int char
+    boolean void true false null this let do if else while return
+- Symbols - { } ( ) [ ] . , ; + - * / & | < > = ~
+- integerConstant - a decimal number in range 0..32767
+- String Constant - A sequence of unicode characters between " "s,
+- identifier - (starts with letter of '_')
+
+TokenizerTest
+- Takes stream of characters and outputs xml body of output
+
+### Grammars
+
+A set of rules, describing how tokens can be combined to create valid language constructs
+
+Each rules consists of a left-hand side, listing a template's name, and a right-hand side 
+describing how the template is composed.
+
+It's a recursive structure.
+
+#### A Jack Grammar is a set of statements.
+
+e.g
+
+      statement: ifStatement |
+                 whileStatement |
+                 letStatement
+     statements: statement* // 1 of more.
+    ifStatement: 'if' '(' expression ')'
+                '{' statements '}'
+ whileStatement: 'while' '(' expression ')'
+                 '{' statements '}'
+   letStatement: 'let' varName '=' expression ';'
+     expression: term (op term)? // ? denotes 0 or more
+           term: varName | constant
+        varName: a string not beginning with a digit
+       constant: a decimal number
+             op: '+' '-' '=' '>' '<'
+
+### Parse Trees
+
+- Determine if the given input confirms to the grammar
+- In the process, construct the grammatical structure of the input
+
+It's a recursive tree structure where you encounter tokens or leaves of the tree
+which represent the tokens of terminal statements of the syntax.
+
+### Parser Logic
+
+The compilation engine will consist of methods for each possible statement.
+
+There is a set of compileXXX methods, one for (almost) each non-terminal rule xxx.
+
+e.g. compileWhile()
+
+Parsing logic:
+- follow right hand side of the rule, parse the input accordingly.
+- If the right-hand side specifies a non-terminal rule xxx, call compileXXX
+- Do this recursively
+
+Init:
+- Advance the tokenizer
+
+(see pic for example of while statement parsing)
+
+compileWhileStatement() {
+  eat('while'); code to handle 'while';
+  eat('('); code to handle '('
+  compileExpression();
+  eat(')'); code to handle ')'
+  ...
+}
+
+eat(string) {
+  if (currentToken <> string)
+    error...
+  else
+    advance...
+}
+
+- LL Grammar: can be parsed by a recursive descent parser without backtracking.
+- LL(k) parser: a parser that needs to look ahead at most k tokens in order to determine
+  which rule is applicable
+- The grammar that we saw so far is LL(1)
+
+### The JACK Grammar
+
+5 Lexical elements - These are the terminal rules / tokens / atoms
+from which JACK exists.
+
+A Jack program is a collection of classes. Each appearing in a separate
+file, and each compiled separately. Each class is structured as follows:
+
+_xxx_* appears 0 or more times
+_xxx_? appears 0 or 1 times
+
+#### Lexical Elements 
+
+(see 5 types of tokens above)
+
+#### Program Structure
+         class: 'class' className '{' classVarDec* subroutineDec* '}'
+
+   classVarDec: ('static'|'field') type varName (',' varName)* ';'
+
+          type: 'int' | 'char' | 'boolean' | className
+
+ subroutineDec: ('constructor' | 'function' | 'method')
+                ('void' | type) subroutineName '(' parameterList ')'
+                subroutineBody
+ parameterList: ((type varName) (, type varName)*)?
+
+subroutineBody: '{' varDec* statements '}'
+
+        varDec: 'var' type varName (',' varName)* ';'
+
+     className: identifier
+subroutineName: identifier
+       varName: identifier
+
+#### Statements
+     statements: statement*
+      statement: letStatement | whileStatement | ifStatement
+                 | doStatement | returnStatement
+   letStatement: 'let' varName('[' expression ']')? '=' expression ';'
+    ifStatement: 'if' '(' expression ')' '{' statements '}'
+ whileStatement: 'while' '(' expression ')' '{' statements '}'
+    doStatement: 'do' subroutineCall ';'
+returnStatement: 'return' expression;
+
+#### Expressions
+     expression: term (op term)*
+           term: integerConstant | stringConstant | keywordConstant |
+                 varName | varName '[' expression ']' | subroutineCall |
+                 '(' expression ')' | unaryOp term
+ subroutineCall: subroutineName '(' expressionList ')' | (className | varName)
+                 '.' subroutineName '(' expressionList ')'
+ expressionList: (expression (',' expression)*)?
+             op: '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '>'
+        unaryOp: '-' | '~'
+KeywordConstant: 'true' | 'false' | 'null' | 'this'
+
+#### varName Lookahead
+
+When the current token is a varName (some identifier), it can be the first token in
+any of these possibilities:
+- foo
+- foo[expression]
+- foo.var(expressionList)
+- Foo.bar(expressionList)
+- bar(expressionList)
+
+To resolve possibility, we are in, the parser should 'look ahead', save the currentToken, and advance
+to get the next one.
+
+Only time that the JACK language is LL(2)
+
+### The JACK Analyzer
+
+Takes input and (for now) generates XML Output which pertains to the
+recursive body of the provided JACK code.
+
+- The parser generates marked-up output
+- The mark up created a textual parse tree
+- Generated according to the Jack grammar
+
+Handling inputs that correspond to terminal rules:
+
+If we encounter a terminalElement xxx of type,
+  keyword, symbol, integerConstant, stringConstant, or identifier
+
+Parser generates the output:
+
+<terminalElement> xxx </terminalElement>
+
+If we encounter a non-terminal element, we generate:
+
+<nonTerminal>{resursive output of non-terminal rule}</nonTerminal>
+
+varNames simply generate identifiers.
+
+### JACK: Proposed Implementation
+
+Implementation Plan:
+- JackTokenizer
+- CompilationEngine
+- JackAnalyzer (top-most module)
+
+To run use command:
+`node JackAnalyzer input`
+where input is:
+- a fileName.jack
+- directoryName
+
+#### Jack Tokenizer
+
+Handles Lexical Elements
+
+Allows:
+- ignoring white space
+- Advancing the input, one token at a time
+- Getting the value and type of the current token
+
+Example API:
+- hasMoreTokens()
+- advance()
+- tokenType()
+
+Compilation Engine consumes and drives the tokenizer.
+
+#### Compilation Engine
+
+- Gets its input from a JackTokenizer, and emits its output to
+an output file.
+
+- The output is generated by a series of compileXXX routines, one
+for (almost) every non-terminal rule xxx in the grammar
+
+- Each compileXXX routine is responsible for handling all the tokens
+that make up xxx, advancing the tokenizer exactly beyond these tokens, and
+outputing the parsing of xxx
+
+API:
+- Constructor
+- compileClass
+  - compileVlassVarDec
+  - compileSubroutineDec
+  - compileParameterList
+  - compileSubroutineBody
+  - compileVarDec
+- compileStatements
+  - compileLet
+  - compileIf
+  - compileWhile
+  - compileDo
+  - compileReturn
+- compileExpression
+  - compileTerm
+  - compileExpressionList
+
+Thse rules don't have specific methods:
+- type
+- className
+- subroutineName
+- variableName
+- statement
+- subroutineCall
+
+(these are shallow, or easy to implement)
+
+#### JackAnalyzer
+
+- Top most module
+
+receives file name or directory
+
+Creates Tokenizer - reads file xxx.jack
+Creates output file - outputs xxx.xml
+Creates and uses compilation engine and uses it to
+Create output generated from file given to tokenizer
+
+### Project 10: Building a Syntax Analyser
+
+Contract:
+- implement syntax analyzer for the JACK language
+- Use it to parse all the supplied test .jack class files
+- For each test .jack file, your analyzer should generate an .xml
+output file, identical to the supplied compare file
+
+Tools & Resources:
+- Test Program and Compare Files: nand2tetris/projects/10
+- TextComparer: nand2tetris/tools
+- XML file viewer: browser, text editor
+
+Plans:
+- Build a tokenizer
+- Build a compilation engine
+  - basic version (without expressions)
+  - complete version
+
+Should not output double-quotes
+
+Following symbold need to be converted to htmlentitie:
+'<' - &lt;
+'>' - &gt;
+'"' - &quot;
+'&' - &amp;
+
+compileSubroutineCall logic should be part of compileTerm
