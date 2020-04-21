@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const tokenizer = require('../JackTokenizer');
+const xmlWriter = require('../XmlWriter')
 
 async function isDirectory(filePath) {
   return fs.lstatSync(filePath).isDirectory();
@@ -8,6 +9,24 @@ async function isDirectory(filePath) {
 
 async function getFiles(filePath) {
   return fs.readdirSync(filePath);
+}
+
+async function writeTokens(targetFile, tokenProvider) {
+  try {
+    const targetFileT = `${targetFile}Tokens.xml`
+    const writer = xmlWriter(targetFileT);
+    const { writeTagStart, writeTagEnd, writeTerminal, finish } = writer
+    writeTagStart('tokens');
+    while (tokenProvider.hasMoreTokens()) {
+      const { type, value } = tokenProvider.getToken();
+      writeTerminal(type, value);
+    }
+    writeTagEnd('tokens');
+    finish();
+  } catch (e) {
+    console.error(e)
+  }
+
 }
 
 async function main(fileOrDirectory) {
@@ -21,7 +40,7 @@ async function main(fileOrDirectory) {
         const jackFile = await readFile(currentFilePath);
         const tokens = t.tokenize(jackFile);
         console.log(tokens)
-        
+        await writeTokens(currentFilePath, t);
       }
     })
   } else {

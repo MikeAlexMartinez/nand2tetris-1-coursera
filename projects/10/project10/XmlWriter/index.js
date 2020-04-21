@@ -1,43 +1,58 @@
 const fs = require('fs');
 
-function xmlWriter() {
+const htmlEntities = {
+  ['<']: '&lt;',
+  ['>']: '&gt;',
+  ['"']: '&quot;',
+  ['&']: '&amp;',
+}
+
+function xmlWriter(filePath) {
   let depth = 0;
-  let stream;
+  let fileEntries = []
 
   function addDepth() {
-    const arr = new Array(depth)
+    const arr = new Array(depth).fill(' ')
     const str = arr.join('');
     return str;
   }
 
-  function createStream(filePath) {
-    stream = fs.createWriteStream(filePath, { flags: 'a' });
-  }
-  
   function writeTerminal(tag, contents) {
-    stream.write(`${addDepth()}<${tag}> ${contents} </${tag}>\n`);
+    if (tag === 'symbol') {
+      if (htmlEntities.hasOwnProperty(contents)) {
+        contents = htmlEntities[contents];
+      }
+    }
+    if (tag === 'stringConstant') {
+      contents = `${contents}`;
+    }
+    fileEntries.push(`${addDepth()}<${tag}> ${contents} </${tag}>`);
   }
 
   function writeTagStart(tag) {
-    stream.write(`${addDepth()}<${tag}>\n`);
-    depth = depth + 2;
+    fileEntries.push(`${addDepth()}<${tag}>`)
   }
 
   function writeTagEnd(tag) {
-    depth = depth - 2;
-    stream.write(`${addDepth()}</${tag}>\n`);
+    fileEntries.push(`${addDepth()}</${tag}>`)
   }
 
-  function closeStream() {
-    stream.end();
+  async function finish() {
+    fileEntries.push('');
+    try {
+      await fs.writeFileSync(filePath, fileEntries.join('\n'), { encoding: 'utf8' });
+    } catch (e) {
+      console.log('error writing file');
+      console.error(e);
+      throw e;
+    }
   }
 
   return {
-    createStream,
-    closeStream,
     writeTerminal,
     writeTagStart,
     writeTagEnd,
+    finish,
   }
 }
 

@@ -28,7 +28,9 @@ function tokenizer() {
   let accessCount = 0
   let tokens = []
 
-  const hasMoreTokens = () => accessCount < tokens.length
+  const hasMoreTokens = () => {
+    return accessCount < tokens.length
+  }
 
   const getToken = () => {
     if (hasMoreTokens()) {
@@ -42,7 +44,7 @@ function tokenizer() {
   const processToken = (t) => {
     const [value, stringConstant, identifierOrKeyword, integerConstant, space, symbol] = t
     if (value === stringConstant) {
-      tokens.push({ value, type: 'stringConstant' })
+      tokens.push({ value: value.replace(/\"/g, ''), type: 'stringConstant' })
     } else if (value === identifierOrKeyword) {
       if (keywords.includes(value)) {
         tokens.push({ value, type: 'keyword' })
