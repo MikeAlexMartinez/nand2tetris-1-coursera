@@ -195,11 +195,12 @@ function compilationEngine(tokenProvider, xmlWriter) {
 
     // subRoutineName(expressionList)
     // (className | varName).subroutineName(expressionList) 
-    writeTerminal(getToken());
+    const varOrClassName = getToken();
+    writeTerminal(varOrClassName);
 
     // . or (
     let nextToken = getToken();
-    if (notBrackets(nextToken)) {
+    if (notBrackets(nextToken.value)) {
       // .
       writeTerminal(nextToken)
       // subroutineName
