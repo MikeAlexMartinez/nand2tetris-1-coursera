@@ -12,29 +12,33 @@ function xmlWriter(filePath) {
   let fileEntries = []
 
   function addDepth() {
+
     const arr = new Array(depth).fill(' ')
     const str = arr.join('');
     return str;
   }
 
-  function writeTerminal(tag, contents) {
-    if (tag === 'symbol') {
-      if (htmlEntities.hasOwnProperty(contents)) {
-        contents = htmlEntities[contents];
+  function writeTerminal(token) {
+    let { type, value } = token
+    if (type === 'symbol') {
+      if (htmlEntities.hasOwnProperty(value)) {
+        value = htmlEntities[value];
       }
     }
-    if (tag === 'stringConstant') {
-      contents = `${contents}`;
+    if (type === 'stringConstant') {
+      value = `${value}`;
     }
-    fileEntries.push(`${addDepth()}<${tag}> ${contents} </${tag}>`);
+    fileEntries.push(`${addDepth()}<${type}> ${value} </${type}>`);
   }
 
-  function writeTagStart(tag) {
-    fileEntries.push(`${addDepth()}<${tag}>`)
+  function writeTagStart(type) {
+    fileEntries.push(`${addDepth()}<${type}>`)
+    depth = depth + 2
   }
 
-  function writeTagEnd(tag) {
-    fileEntries.push(`${addDepth()}</${tag}>`)
+  function writeTagEnd(type) {
+    depth = depth - 2
+    fileEntries.push(`${addDepth()}</${type}>`)
   }
 
   async function finish() {

@@ -74,10 +74,16 @@ function tokenizer() {
     return tokens;
   }
 
+  const resetCount = () => accessCount = 0;
+
+  const pushBack = (n) => accessCount = accessCount - n;
+
   return {
     tokenize,
     hasMoreTokens,
     getToken,
+    resetCount,
+    pushBack,
   }
 }
 

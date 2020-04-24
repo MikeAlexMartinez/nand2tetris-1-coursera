@@ -1,0 +1,128 @@
+<class>
+  <keyword> class </keyword>
+  <identifier> SquareGame </identifier>
+  <symbol> { </symbol>
+  <classVarDec>
+    <keyword> field </keyword>
+    <identifier> Square </identifier>
+    <identifier> square </identifier>
+    <symbol> ; </symbol>
+  </classVarDec>
+  <classVarDec>
+    <keyword> field </keyword>
+    <keyword> int </keyword>
+    <identifier> direction </identifier>
+    <symbol> ; </symbol>
+  </classVarDec>
+  <subroutineDec>
+    <keyword> constructor </keyword>
+    <identifier> SquareGame </identifier>
+    <identifier> new </identifier>
+    <symbol> ( </symbol>
+    <parameterList>
+    </parameterList>
+    <symbol> ) </symbol>
+    <subroutineBody>
+      <symbol> { </symbol>
+      <statements>
+        <letStatement>
+          <keyword> let </keyword>
+          <identifier> square </identifier>
+          <symbol> = </symbol>
+          <expression>
+            <term>
+              <identifier> Square </identifier>
+              <symbol> . </symbol>
+              <identifier> new </identifier>
+              <symbol> ( </symbol>
+              <expressionList>
+                <integerConstant> 0 </integerConstant>
+                <expression>
+                  <term>
+                    <symbol> , </symbol>
+                    <expression>
+                      <term>
+                        <integerConstant> 0 </integerConstant>
+                      </term>
+                    </expression>
+                    <symbol> , </symbol>
+                  </term>
+                </expression>
+                <integerConstant> 30 </integerConstant>
+                <expression>
+                  <term>
+                    <symbol> ) </symbol>
+                    <expression>
+                      <term>
+                        <symbol> ; </symbol>
+                        <expression>
+                          <term>
+                            <keyword> let </keyword>
+                          </term>
+                        </expression>
+                        <identifier> direction </identifier>
+                      </term>
+                      <symbol> = </symbol>
+                      <term>
+                        <integerConstant> 0 </integerConstant>
+                      </term>
+                    </expression>
+                    <symbol> ; </symbol>
+                  </term>
+                </expression>
+                <keyword> return </keyword>
+                <expression>
+                  <term>
+                    <keyword> this </keyword>
+                  </term>
+                </expression>
+                <symbol> ; </symbol>
+                <expression>
+                  <term>
+                    <symbol> } </symbol>
+                    <expression>
+                      <term>
+                        <keyword> method </keyword>
+                      </term>
+                    </expression>
+                    <keyword> void </keyword>
+                  </term>
+                </expression>
+                <identifier> dispose </identifier>
+                <expression>
+                  <term>
+                    <symbol> ( </symbol>
+                    <expression>
+                      <term>
+                        <symbol> ) </symbol>
+                        <expression>
+                          <term>
+                            <symbol> { </symbol>
+                            <expression>
+                              <term>
+                                <keyword> do </keyword>
+                              </term>
+                            </expression>
+                            <identifier> square </identifier>
+                          </term>
+                        </expression>
+                        <symbol> . </symbol>
+                      </term>
+                    </expression>
+                    <identifier> dispose </identifier>
+                  </term>
+                </expression>
+              </expressionList>
+              <symbol> ) </symbol>
+            </term>
+          </expression>
+          <symbol> ; </symbol>
+          <keyword> do </keyword>
+        </letStatement>
+      </statements>
+      <identifier> Memory </identifier>
+    </subroutineBody>
+    <symbol> . </symbol>
+  </subroutineDec>
+  <identifier> deAlloc </identifier>
+</class>

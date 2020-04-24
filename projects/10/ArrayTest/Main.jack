@@ -29,19 +29,10 @@ class Main {
         let i = i + 1;
     }
 
-    do Main.test();
     do Output.printString("THE AVERAGE IS: ");
     do Output.printInt(sum / length);
     do Output.println();
 
     return;
-  }
-
-  function int test(int num) {
-    if (num = 1) {
-      return -1;
-    } else {
-      return 0;
-    }
   }
 }

@@ -6,7 +6,6 @@ function jackAnalyzer() {
     const target = args[2];
     if (!target) throw new Error('No target file provided');
     await main(target);
-    process.exit(0);
   })(args).catch((err) => {
     console.log('ERROR ENCOUNTERED');
     console.error(err);
