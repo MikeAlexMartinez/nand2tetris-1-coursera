@@ -39,10 +39,6 @@ async function main(fileOrDirectory) {
         const t = tokenizer()
         const jackFile = await readFile(currentFilePath);
         const tokens = t.tokenize(jackFile);
-        console.log(tokens.length)
-        console.log(tokens.slice(0,40))
-        console.log(tokens.slice(40,80))
-        console.log(tokens.slice(80))
         await writeTokens(currentFilePath, t);
         const writer = xmlWriter(`${currentFilePath}.xml`)
         const { compileClass } = compilationEngine(t, writer)
@@ -53,7 +49,6 @@ async function main(fileOrDirectory) {
     const tokenizer = Tokenizer()
     const jackFile = await readFile(filePath);
     const tokens = tokenizer(jackFile);
-    console.log(tokens)
   }
 }
 

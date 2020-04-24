@@ -7,12 +7,21 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Array Test",
       "skipFiles": [
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}/projects/10/project10/JackAnalyzer.js",
       "args": ["${workspaceFolder}/projects/10/ArrayTest"]
+    }, {
+      "type": "node",
+      "request": "launch",
+      "name": "ExpressionLessSquare",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/projects/10/project10/JackAnalyzer.js",
+      "args": ["${workspaceFolder}/projects/10/ExpressionLessSquare"]
     }
   ]
 }
