@@ -6,18 +6,18 @@ const isStatement = (value) => ['let', 'if', 'while', 'do', 'return'].includes(v
 const isElse = (value) => value === 'else';
 const isLeftSquareBracket = (value) => value === '[';
 const termIsSimpleConstant = (type) => ['stringConstant', 'keyword', 'integerConstant'].includes(type);
-const termIsEndBracket = (value) => [')', ']'].includes(value);
+const notRightBracket = (value) => value !== ')';
 const termIsSymbol = (type) => type === 'symbol';
 const isSubroutineDec = (value) => ['constructor', 'function', 'method'].includes(value);
 const isUnary = (value) => ['-', '~'].includes(value);
 const isOpToken = (value) => ['+', '-', '*', '/', '&', '|', '<', '>', '='].includes(value);
 
 function compilationEngine(tokenProvider, xmlWriter) {
-  const { resetCount, getToken, hasMoreTokens, pushBack } = tokenProvider
+  const { getToken, pushBack } = tokenProvider
   const { finish, writeTagStart, writeTagEnd, writeTerminal } = xmlWriter
 
   // only required if we have written token file
-  resetCount();
+  // resetCount();
   return { compileClass };
 
   async function compileClass() {
@@ -351,7 +351,6 @@ function compilationEngine(tokenProvider, xmlWriter) {
     // integerConstant
     // stringConstant
     // keyword
-    console.log(firstTerm);
     if (termIsSimpleConstant(firstTerm.type)) {
       writeTerminal(firstTerm)
     } else if (termIsSymbol(firstTerm.type)) {
@@ -416,7 +415,7 @@ function compilationEngine(tokenProvider, xmlWriter) {
 
   function compileExpressionList(firstToken) {
     writeTagStart('expressionList');
-    if (notBrackets(firstToken.value)) {
+    if (notRightBracket(firstToken.value)) {
       compileExpression(firstToken);
   
       let nextToken = getToken();
