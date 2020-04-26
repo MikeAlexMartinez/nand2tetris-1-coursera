@@ -1,0 +1,9 @@
+Expected Symbols
+
+ArrayTest:
+| name | type | kind | # |
+|-|-|-|-|
+| a | Array | local | 0 |
+| length | int | local | 1 |
+| i | int | local | 2 |
+| sum | int | local | 3 |

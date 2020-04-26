@@ -2170,10 +2170,175 @@ pop that 0
 
 ### Standard Mapping over Virtual Machine
 
+Conventions that JACK programmers are recommended to follow.
 
+- Each filename.jack is compiled into the fileName.vm
+- Each subroutine subName in fileName.jack is compiled into
+a VM function fileName.subName.
+- A Jack constructor / function with k arguments is compiled
+into a VM function that operates on k arguments.
+- A Jack method with k arguments is compiled into a VM 
+function that operates on k+1 arguments
+
+Variables Mapping:
+The local variables are mapped onto local segment local
+
+The argument cariables are mapped on the virtual segment argument
+
+The static variables are mapped on to the virtual memory segment static of the compiled .vm class file
+
+The field variables of the current object are accessed as follows:
+- assumption: pointer 0 has been set to the this object
+- the i-th field is mapped on this i
+
+Arrays:
+Access to any array entry arr[1] is realized as follows:
+- first, set pointer 1 to the entry's address (arr + i)
+- access the entry by accessing this 0
+
+Compiling subroutines
+
+methods:
+- compiled VM code must set the base of the this segment to 
+argument 0.
+
+constructors
+- the compiled VM code must allocate a memory block for the 
+new object, and then set the base of the segment this to the 
+new object's base address.
+- The compiled VM code must return the object's base address
+to the caller.
+
+void function / methods
+- compiled VM code must return the value constant 0
+- Caller must dispose of the returned value 0
+
+Compiling a subroutine call subName(arg1, arg2, ...):
+- The caller (a VM function) must push the arguments onto 
+the stack, and then call the subroutine
+
+If the called subroutine is a method
+- Caller must first push a reference to the object on which 
+the method is supposed to operate.
+- next, the caller must push arg1, arg2, ... and then call 
+the method
+
+If the called subroutine is void:
+- the caller must pop and ignore the returned value
+
+Compiling constants
+- null constant 0
+- false constant 0
+- true constant -1
+push 1 neg
+
+OS Classes and subroutines
+...
+
+Special OS Services
+Multiplication - Is handled with Math.multiply
+Division is handled by using OS function Math.divide
+String constants are created using the OS constructor
+string.new(length)
+
+String assignments like x = "cc...c" are handled using a series of calls to String.appendChar(c)
+
+Object construction requires allocating space for the new object using the OS function Memory.alloc(size)
+
+Object recycling is handled using Memory.dealloc(this)
 
 ### Completing the Compiler: Proposed Implementation
 
+Recommended 5 modules:
+- JackCompiler: top-most module
+- JackTokenizer
+- SymbolTable
+- VMWriter: generates VM code
+- CompilationEngine: recursive top-down compilation engine
+
+#### Symbol Table
+
+The compiler never needs more than two symbol tables.
+One per class, and one for each subroutine.
+
+constructor
+startSubroutine
+define (name, type, kind)
+  kinds:
+    - STATIC
+    - FIELD
+    - ARG
+    - VAR
+varCount number of fields for each kind
+kindOf
+typeOf
+indexOf
+
+The symbol table can be implemented using two separate hash 
+tables: one for the class scope, and one for the subroutine 
+scope.
+
+When starting a new subroutine, the previous subroutine table
+can be overridden.
+
+When compiling an error-free JACK code, each symbol not 
+found in the symbol tables can be assumed to be either a 
+subroutine name or a class name.
+
+#### VM Writer
+
+constructor
+writePush
+writePop
+writeArithmetic
+writeLabel
+writeGoto
+writeIf
+writeCall
+writeFunction
+writeReturn
+close
+
+#### Compilation Engine
+
+...
+
 ### Project 11
 
+stage 0: syntax analyzer (done)
+stage 1: symbol table handling
+stage 2: code generation
+
+#### Symbol Table
+Extending the handling of Identifiers
+- output the identifiers category: var, argument, static, 
+field, class, subroutine
+- if the identifiders category is var, argument, static, 
+field, also the running index assigned to this variable in 
+the symbol table.
+- output whether the identifier is being defined, or being 
+used
+
+Test the extended syntax analyzer using the test projects from project 10.
+
+#### Code generation
+
+6 Test programs:
+- Develop the compiler in the defined order
+
+Seven
+ConvertToBin
+Square
+Average
+Pong
+ComplexArrays
+
+For each program:
+1. Use your compiler to compile the program directory
+2. Inspect the generated code
+3. Load the directory into the VM Emulator
+4. Run the compiled program, inspect the results
+5. If there's a problem, fix your compiler and go to stage 1
+
 ### Perspective
+
