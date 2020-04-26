@@ -1607,3 +1607,573 @@ Following symbold need to be converted to htmlentitie:
 '&' - &amp;
 
 compileSubroutineCall logic should be part of compileTerm
+
+## Week 11 - Compiler II - Code Generation
+
+Objective: develop a full-scale compiler.
+
+Compilation Challenges:
+- Handling Variables
+- Handling Expressions
+- Handling flow of control
+- Handling objects
+- Handling arrays
+
+The challenge: Expressing the above semantics in the VM Language
+
+Modue take home lessons:
+- Procdeural Code
+  - variables
+  - expressions
+  - flow of control
+- Arrays
+- Objects
+
+Techniques:
+- Parsing
+- Recursive compilation
+- code generation
+- Symbol tables
+- Memory management
+
+### Handling Variables
+
+sum = x * (1 + rate)
+
+becomes:
+
+push x
+push 1
+push rate
+add
+mult
+pop sum
+
+In order to generate actual VM code,
+we must know (among other things):
+- Wether each variable is a:
+  field, static, local, or argument
+- Wether each variable is the first,
+  second, third.. variable of its kind.
+
+We have to handle:
+- class-level variables
+  - field
+  - static
+- subroutine-level variables
+  - local
+  - args
+
+Variable Properties (in Jack):
+- name (identifier)
+- type (int, char, boolean, class name)
+- kind (filed, static, local, argument)
+- scope (class level, subroutine level)
+
+Variable Properties:
+- needed for code generation
+- use a symbol table
+
+the following code needs to generate the following symbol
+table:
+
+```java
+class Point {
+  field int x, y;
+  static int pointCount;
+  ...
+  method int distance(Point other) {
+    var int dx, dy;
+    let dx = x - other.getx();
+    let dy = y - other.gety();
+    return Math.sqrt((dx*dx) + (dy*dy));
+  }
+  ...
+}
+```
+
+-> Class Scope
+
+| name | type | kind | # |
+|------|--|--|--|
+| x | int | field | 0 |
+| y | int | field | 1 | 
+| pointCount | int | static | 0 |
+
+Indicates we have 2 fields and 1 static
+
+-> method scope
+
+All methods (operate on the class object) need to begin with the this entry
+
+| name | type | kind | # |
+|------|--|--|--|
+| this | Point | argument | 0
+| this | Point | argument | 1
+| dx | int | local | 0
+| dy | int | local | 1
+
+Class-level symbol table and subroutines
+Each time you begin a new class you can throw away the corresponding symbol table
+
+#### Handling variable declarations:
+- field / static / var type varName
+
+each time you encounter an identifier that has one of these items, we need to add to the symbol table
+
+arguments are encountered when you process the parameter list
+
+#### Handling variable usage:
+- let dx = x - other.getX();
+Look up in the subroutine symbol table, if not found, check the class level
+symbol table.
+
+Programming languages vary in terms of:
+- variable types
+- variable kinds
+- nested scoping
+
+The variable technique that we showed can be easily generalized to handle
+the variables in any language
+
+Some languages feature unlimited nested scoping. You can recursively check
+symbol tables until you encouter the variable, or you can throw an error, if
+the variable is undefined.
+
+### Handling Expressions
+
+infix - Human oriented: a * (b + c)
+prefix - functional: * a + b c
+postfix - stack oriented a b c + *
+
+Can use Depth first tree traversal.
+
+Algorithm recommended, "codewrite".
+
+  x + g(2, y, -z) * 5
+
+becomes:
+
+  push z
+  push 2
+  push y
+  push z
+  neg
+  call z
+  push 5
+  *
+  +
+
+if exp is a number n:
+  output "push n"
+
+if exp is a variable var:
+  output "push var"
+
+if exp is "exp1 op exp2":
+  codewrite(exp1)
+  codewrite(exp2)
+  output "op"
+
+if exp is "op exp"
+  codewrite(exp)
+  output "op"
+
+if exp is "f(exp1, exp2, ...)":
+  codewrite(exp1)
+  codewrite(exp2)
+  output "call f"
+
+- The JACK language defines no operator priority (except for parentheses)
+- The order priority is left up to the compilers developer
+- Parentheses can always be used to enforce operator priority
+
+### Handling flow of control
+
+Vm code uses:
+- goto
+- if-goto
+- label
+
+#### Compiling If statements
+
+if:
+
+if (expression)
+  statements1
+else
+  statements2
+
+becomes:
+  compiled(expression)
+  not
+  if-goto L1
+  compiled(statements1)
+  goto L2
+label L1
+  compiled(statements2)
+label L2
+
+while(expression)
+  statements
+
+becomes:
+label L1
+  compiled(expression)
+  not
+  if-goto L2
+  compiled(statements)
+  goto L1
+label L2
+
+Some complications:
+
+- A program contains multiple if and while statements.
+Solution: the compiler needs to generate labels that
+are unique
+
+- The if and while statements are often nested
+Solution: the compiler employs a highly recursive
+strategy
+
+### Handling objects
+
+- High-level OO programs create and manipulate objects and arrays
+- Mid-level VM programs operate on virtual memory segments
+- Low-level machine programes operate directly on RAM
+
+compiler: bridges these gaps
+
+#### Low-level Aspects of object
+
+local, argument
+- represent local and argument variables
+- located on the stack
+
+Implementation
+- base address: LCL and ARG
+- mangaged by the VM implementation
+
+this, that
+- represent object and array data
+- located on the heap
+
+Implementation
+- base addresses: THIS and THAT
+- set using pointer 0 (this)
+            pointer 1 (that)
+- mangaged by VM code
+
+e.g.
+push 8000
+pop pointer 0
+
+sets THIS to 8000
+
+can then use:
+push / pop this 0 = ram[8000]
+push / pop this 1 = ram[8001]
+...
+push / pop this i = ram[8000+i]
+
+To set 8000 to 18
+
+push 8000
+pop pointer 0
+push 17
+pop this 0
+
+Object data is accessed via the this segment
+Array data is accessed via the that segment
+
+#### Construction of objects
+
+Compiling the callee and the caller is two separate processes.
+
+The Callers side: compiling new
+
+var Point p1, p2;
+var int d;
+
+let p1 = Point.new(2, 3)
+let p2 = Point.new(5, 7)
+
+compiled code:
+
+// compiler generates no codes for declarations, just prepares symbol table
+
+push 2
+push 3
+call Point.new
+pop p1 // p1 - base address of the new object
+
+Contract: the caller assumes that the constructors code(i)
+arranges a memory block to store the new object, and (ii) returns
+its base address to the caller.
+
+The Callee:
+- Arrange the creation of the new object
+- Initializes the new object to some initial state
+
+How to access the objects fields:
+- The constructors code can access the object's data using the
+this segment
+- But first the constuctors code must anchor the this segment on the objects
+data using pointer
+
+e.g.
+// constructor Point new(int ax, int ay) {
+//   let x = ax;
+//   let y = ay;
+//   let pointCount = pointCount + 1;
+//   return this;
+// }
+
+// The compiler creates the subroutine's symbol table
+
+// The compiler figures out the size of an object of this
+// class(n), and writes code that calls Memory.alloc(n).
+// This OS method finds a memory block of the required
+// size, and returns its base address
+push 2 // two 16-bit words are required (x and y)
+call Memory.alloc 1 // one argument
+pop pointer 0 // anchors this at the base address
+
+// let x = ax,
+// let y = ay;
+push argument 0
+pop this 0
+push argument 1
+pop this 1
+
+// let pointCount = pointCount + 1;
+push static 0
+push 1
+add
+pop static 0
+
+// return this
+push pointer 0
+return // returns base address of new object on top of the stack
+
+#### Manipulation of objects
+
+some class:
+...
+var Point p1, p2, p3;
+var int x, d;
+...
+let p1 = Point.new(2, 3);
+let p2 = Point.new(5, 7);
+...
+let x = p1.getx();
+let p3 = p1.plus(p2);
+let d = p1.distance(p2);
+
+- Ultimately, the target machine is procedural
+- Therefore, the compiler must rewrtie the OO method calls in
+  a procedural style
+
+OO style => procedural styl
+
+p1.distance(p2) becomes distance(p1, p2);
+
+// obj.foo(x1, x2, ...)
+// Pushes the object on which the method
+// is called to operate (implicit parameter)
+// then pushes the method arguments,
+// then calls the method for its effect.
+push obj
+push x2
+push ...
+call foo
+
+##### Compiling Methods
+
+Methods are designed to operate on the current
+object (this):
+
+Therefore, each method's code needs access to
+the object's fields
+
+How to access the object's fields:
+
+- The method's code can access the object's i-th
+field by accessing this i
+- But first, the method's code must anchor the this
+segment on the object's data, using pointer
+
+Example:
+...
+let d = p1.distance(p2);
+...
+
+/** Represents a Point. */
+class Point {
+  field int x, y;
+  static int pointCount;
+  ...
+  /** Distance to the other point */
+  method int distance(Point other) {
+    var int dx, dy;
+    let dx = x - other.getx();
+    let dy = y - other.gety();
+    return Math.sqrt((dx*dx) +
+                     (dy*dy));
+  }
+  ...
+}
+
+Symbol Tables:
+
+// Object
+| name | type | kind | # |
+|-|-|-|-|
+| x | int | field | 0 |
+| y | int | field | 1 |
+| pointCount | int | static | 0 |
+// Subroutine
+| name | type | kind | # |
+|-|-|-|-|
+| this | Point | argument | 0 |
+| other | Point | argument | 1 |
+| dx | int | local | 0 |
+| dy | int | local | 1 |
+
+Compiled VM code
+...
+// method int distance(Point other)
+// var int dx, dy
+// The compiler constructs the method's
+// symbol table. No code is generated.
+// Next, it generates code that associates
+// the this memory segment with the object on
+// which the method is called to operate.
+push argument 0
+pop pointer 0 // THIS = argument 0
+// let dx = x - other.getx();
+push this 0
+push argument 1
+call Point.getx 1
+sub
+pop local 0
+// let dy = y - other.gety();
+// similar code omitted.
+// return Math.sqrt((dx*dx)+(dy*dy))
+push local 0
+push local 0
+call Math.multiply 2
+push local 1
+push local 1
+call Math.multiply 2
+add
+call Math.sqrt 1
+return
+
+##### Compiling void methods
+
+
+do p1.print();
+
+class Point {
+  ...
+  method void print() {
+    // code omitted
+  }
+  ...
+}
+
+Every method always contains this as the first argument.
+
+push argument 0
+pop pointer 0 // THIS - argument 0
+// compiled code omitted
+// methods must return a value
+push constant 0
+return
+
+compiled caller code:
+push p1
+call Point.print
+// the callser of a void method must
+// remove the unneeded returned value
+pop temp 0
+
+### Handling arrays
+
+var Array arr;
+// updates symbol table
+let arr = Array.new(5);
+// allocates base address on stack
+// allocates memory on heap starting from
+// given base address
+
+#### this and that
+
+Two portable virtual memory segments that can be aligned
+to different RAM addresses
+
+this - represents the values of the current object
+that - represents the values of the current array
+pointer (base address):
+  this - THIS - pop pointer 0
+  that - THAT - pop pointer 1
+
+#### Array Access
+
+Example:
+
+arr[2] = 17
+
+push arr // base address
+push 2 // offset
+add  // combine
+pop pointer 1 // push on to that segment
+push 17
+pop that 0
+
+// arr[expression1] = expression2
+push arr
+push expression1
+add
+pop pointer 1
+push expression2
+pop that 0
+!!!!PROBLEM
+
+a[i] = b[j]
+push a
+push i
+add
+push b
+push j
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+!!! This always works for array access
+
+General solution for generating array access code
+// arr[expression1] = expression2
+push arr
+VM code for computing and the pushing the value of expression1
+add
+VM code for computing and pushing the value of expression2
+pop temp 0 // temp 0 = value of expression2
+           // top stack value = RAM address of arr[expression1]
+pop pointer 1
+push temp 0
+pop that 0
+
+### Standard Mapping over Virtual Machine
+
+
+
+### Completing the Compiler: Proposed Implementation
+
+### Project 11
+
+### Perspective
