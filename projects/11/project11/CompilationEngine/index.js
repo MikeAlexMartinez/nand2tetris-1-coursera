@@ -15,6 +15,8 @@ const termIsSymbol = (type) => type === 'symbol';
 const isSubroutineDec = (value) => ['constructor', 'function', 'method'].includes(value);
 const isUnary = (value) => ['-', '~'].includes(value);
 const isOpToken = (value) => ['+', '-', '*', '/', '&', '|', '<', '>', '='].includes(value);
+const isNotComma = (value) => value !== ',';
+const isComma = (value) => value === ',';
 
 function compilationEngine(tokenProvider, xmlWriter) {
   const { define, varCount, kindOf, typeOf, indexOf, startSubroutine } = symbolTable();
@@ -58,23 +60,27 @@ function compilationEngine(tokenProvider, xmlWriter) {
   function compileClassVarDec(nextToken) {
     writeTagStart('classVarDec');
     // static or field
+    const kind = nextToken
     writeTerminal(nextToken);
     // type
-    writeTerminal(getToken());
+    const typeToken = getToken();
+    writeTerminal(typeToken);
     // varName
-    writeTerminal(getToken());
+    let nameToken = getToken();
+    writeTerminal(nameToken);
 
-    // @TODO: update symbol table for class
+    define(nameToken.value, typeToken.value, kind.value);
 
     let repeatedVarNames = getToken();
     while (isNotSemiColon(repeatedVarNames.value)) {
       // comma
       writeTerminal(repeatedVarNames);
       // varName
-      writeTerminal(getToken());
+      nameToken = getToken();
+      writeTerminal(nameToken);
       repeatedVarNames = getToken();
 
-      // @TODO: update symbol table for class
+      define(nameToken.value, typeToken.value, kind.value);
     }
     // semicolon
     writeTerminal(repeatedVarNames);
@@ -83,7 +89,7 @@ function compilationEngine(tokenProvider, xmlWriter) {
   }
 
   function compileSubroutine(nextToken) {
-    // @TODO: reset subroutine info in symbol table
+    startSubroutine();
 
     writeTagStart('subroutineDec');
     // keyword
@@ -134,8 +140,18 @@ function compilationEngine(tokenProvider, xmlWriter) {
     let nextToken = getToken()
     while (notBrackets(nextToken.value)) {
       // @TODO: Add arg variables
+      const typeToken = nextToken;
       writeTerminal(nextToken);
-      nextToken = getToken();
+      const nameToken = getToken();
+      writeTerminal(nameToken);
+
+      define(nameToken.value, typeToken.value, VAR);
+
+      commaToken = getToken();
+      if (isComma(commaToken.value)) {
+        writeTerminal(commaToken);
+        nextToken = getToken();
+      }
     }
 
     writeTagEnd('parameterList');
@@ -148,21 +164,26 @@ function compilationEngine(tokenProvider, xmlWriter) {
       while (isVar(varToken.value)) {
         writeTagStart('varDec');
         // var
+        let kindToken = varToken;
         writeTerminal(varToken);
         // type
-        writeTerminal(getToken());
+        const typeToken = getToken();
+        writeTerminal(typeToken);
         // varName
-        writeTerminal(getToken());
+        let nameToken = getToken();
+        writeTerminal(nameToken);
 
-        // @TODO: add to subroutine symbol table local
+        define(nameToken.value, typeToken.value, kindToken.value);
 
         let repeatedVarNames = getToken();
         while (isNotSemiColon(repeatedVarNames.value)) {
           // comma
           writeTerminal(repeatedVarNames);
           // varName
-          writeTerminal(getToken());
+          nameToken = getToken();
+          writeTerminal(nameToken);
           // @TODO: add to subroutine symbol table local
+          define(nameToken.value, typeToken.value, kindToken.value);
           repeatedVarNames = getToken();
         }
         // semicolon

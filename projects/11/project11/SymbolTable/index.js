@@ -23,6 +23,7 @@ function symbolTable() {
           count: counts[kind],
         };
         counts[kind]++;
+        console.log(classSymbols);
         break;
       }
       case ARGS:
@@ -32,6 +33,7 @@ function symbolTable() {
           kind,
           count: counts[kind],
         };
+        console.log(subroutineSymbols);
         counts[kind]++;
         break;
       }
