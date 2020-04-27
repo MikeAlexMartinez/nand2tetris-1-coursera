@@ -139,17 +139,16 @@ function compilationEngine(tokenProvider, xmlWriter) {
 
     let nextToken = getToken()
     while (notBrackets(nextToken.value)) {
-      // @TODO: Add arg variables
       const typeToken = nextToken;
       writeTerminal(nextToken);
       const nameToken = getToken();
       writeTerminal(nameToken);
 
-      define(nameToken.value, typeToken.value, VAR);
+      define(nameToken.value, typeToken.value, ARGS);
 
-      commaToken = getToken();
-      if (isComma(commaToken.value)) {
-        writeTerminal(commaToken);
+      nextToken = getToken();
+      if (isComma(nextToken.value)) {
+        writeTerminal(nextToken);
         nextToken = getToken();
       }
     }
@@ -182,7 +181,7 @@ function compilationEngine(tokenProvider, xmlWriter) {
           // varName
           nameToken = getToken();
           writeTerminal(nameToken);
-          // @TODO: add to subroutine symbol table local
+
           define(nameToken.value, typeToken.value, kindToken.value);
           repeatedVarNames = getToken();
         }

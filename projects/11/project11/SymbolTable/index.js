@@ -28,10 +28,11 @@ function symbolTable() {
       }
       case ARGS:
       case VAR: {
+        const count = counts[kind];
         subroutineSymbols[name] = {
           type,
           kind,
-          count: counts[kind],
+          count,
         };
         console.log(subroutineSymbols);
         counts[kind]++;
@@ -68,8 +69,8 @@ function symbolTable() {
 
   const startSubroutine = () => {
     subroutineSymbols = {};
-    counts.ARGS = 0;
-    counts.VAR = 0;
+    counts[ARGS] = 0;
+    counts[VAR] = 0;
   }
 
   return {
