@@ -7,21 +7,22 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "ConvertToBin",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/projects/11/project11/JackAnalyzer.js",
+      "args": ["${workspaceFolder}/projects/11/ConvertToBin"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Array Test",
       "skipFiles": [
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}/projects/10/project10/JackAnalyzer.js",
       "args": ["${workspaceFolder}/projects/10/ArrayTest"]
-    }, {
-      "type": "node",
-      "request": "launch",
-      "name": "ExpressionLessSquare",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "program": "${workspaceFolder}/projects/10/project10/JackAnalyzer.js",
-      "args": ["${workspaceFolder}/projects/10/ExpressionLessSquare"]
     }
   ]
 }

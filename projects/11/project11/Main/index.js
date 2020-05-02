@@ -3,6 +3,7 @@ const fs = require('fs');
 const tokenizer = require('../JackTokenizer');
 const compilationEngine = require('../CompilationEngine');
 const xmlWriter = require('../XmlWriter');
+const { vmWriter } = require('../VmWriter');
 
 async function isDirectory(filePath) {
   return fs.lstatSync(filePath).isDirectory();
@@ -50,9 +51,11 @@ async function compileJackFile(filePath) {
   const jackFile = await readFile(filePath);
   t.tokenize(jackFile);
   // await writeTokens(currentFilePath, t);
-  const targetPath = filePath.replace(/.jack$/, '.xml');
-  const writer = xmlWriter(targetPath);
-  const { compileClass } = compilationEngine(t, writer)
+  const targetXmlPath = filePath.replace(/.jack$/, '.xml');
+  const targetVmPath = filePath.replace(/.jack$/, '.vm');
+  const writer = xmlWriter(targetXmlPath);
+  const vm = vmWriter(targetVmPath);
+  const { compileClass } = compilationEngine(t, writer, vm)
   await compileClass();
 }
 

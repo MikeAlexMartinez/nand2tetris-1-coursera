@@ -1754,12 +1754,12 @@ Algorithm recommended, "codewrite".
 
 becomes:
 
-  push z
+  push x
   push 2
   push y
   push z
   neg
-  call z
+  call g
   push 5
   *
   +
@@ -1802,7 +1802,10 @@ if:
 if (expression)
   statements1
 else
+L1
   statements2
+L2
+
 
 becomes:
   compiled(expression)

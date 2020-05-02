@@ -1,7 +1,8 @@
+const fs = require('fs')
 
 // SEGMENTS
 const CONST = 'constant'
-const ARG = 'arg'
+const ARG = 'argument'
 const LOCAL = 'local'
 const STATIC = 'static'
 const THIS = 'this'
@@ -42,7 +43,7 @@ const commands = {
 }
 
 function vmWriter(targetPath) {
-  fileEntries = []
+  let fileEntries = []
 
   const writePush = (segment, index) => {
     fileEntries.push(`push ${segment} ${index}`);
@@ -53,15 +54,29 @@ function vmWriter(targetPath) {
   }
 
   const writeArithmetic = (command) => {
+    const map = {
+      '+': ADD,
+      '-': SUB,
+      // '*': Math.multiply,
+      // '/': Math.divide,
+      '&': AND,
+      '|': OR,
+      '<': LT,
+      '>': GT,
+      '=': EQ,
+    }
+    if (map.hasOwnProperty(command)) {
+      command = map[command]
+    }
     fileEntries.push(command);
   }
 
   const writeLabel = (label) => {
-    fileEntries.push(`goto ${label}`);
+    fileEntries.push(`label ${label}`);
   }
 
   const writeGoto = (label) => {
-    fileEntries.push(`if-goto ${label}`);
+    fileEntries.push(`goto ${label}`);
   }
 
   const writeIf = (label) => {

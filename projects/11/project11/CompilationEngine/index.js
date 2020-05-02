@@ -2,6 +2,9 @@ const {
   VAR, STATIC, FIELD, ARGS, symbolTable
 } = require('../SymbolTable');
 
+const { commands, segments } = require('../VmWriter');
+const labelGenerator = require('../LabelGenerator');
+
 const isClassVarDec = (value) => ['static', 'field'].includes(value);
 const notBrackets = (value) => value !== '(' && value !== ')';
 const isNotSemiColon = (value) => value !== ';';
@@ -18,10 +21,28 @@ const isOpToken = (value) => ['+', '-', '*', '/', '&', '|', '<', '>', '='].inclu
 const isNotComma = (value) => value !== ',';
 const isComma = (value) => value === ',';
 
-function compilationEngine(tokenProvider, xmlWriter) {
+const callCounter = () => {
+  let count = 0;
+
+  const incCallCount = () => {count++};
+  
+  const getCallCount = () => count;
+
+  return {
+    incCallCount,
+    getCallCount
+  }
+}
+
+function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
   const { define, varCount, kindOf, typeOf, indexOf, startSubroutine } = symbolTable();
   const { getToken, pushBack } = tokenProvider
   const { finish, writeTagStart, writeTagEnd, writeTerminal } = xmlWriter
+  const { writePush, writePop, writeArithmetic, writeLabel, writeGoto,
+    writeIf, writeCall, writeFunction, writeReturn, close } = vmWriter
+  let getIfElseLabels, getIfLabels, getWhileLabels;
+  let getFunctionLabel, getFunctionType, setFunctionType, setFunctionLabel;
+  let className;
 
   // only required if we have written token file
   // resetCount();
@@ -29,12 +50,19 @@ function compilationEngine(tokenProvider, xmlWriter) {
 
   async function compileClass() {
     writeTagStart('class');
-    const keyword = getToken();
     // keyword
+    const keyword = getToken();
     writeTerminal(keyword);
     // identifier
-    const identifier = getToken();
-    writeTerminal(identifier);
+    const classNameToken = getToken();
+    writeTerminal(classNameToken);
+
+    ;({
+      getIfElseLabels, getIfLabels, getWhileLabels, getFunctionLabel,
+      getFunctionType, setFunctionType, setFunctionLabel
+    } = labelGenerator(classNameToken.value))
+    className = classNameToken.value;
+
     // symbol
     const startSymbol = getToken();
     writeTerminal(startSymbol);
@@ -55,6 +83,7 @@ function compilationEngine(tokenProvider, xmlWriter) {
     writeTerminal(nextToken);
     writeTagEnd('class');
     await finish();
+    await close();
   }
 
   function compileClassVarDec(nextToken) {
@@ -96,6 +125,7 @@ function compilationEngine(tokenProvider, xmlWriter) {
     if (!nextToken) {
       nextToken = getToken();
     }
+    const funcType = nextToken.value
     writeTerminal(nextToken);
     // identifier
     const returnType = getToken();
@@ -111,6 +141,12 @@ function compilationEngine(tokenProvider, xmlWriter) {
 
     // parameterList
     const endSymbol = compileParameterList();
+
+    // store function information for use when 
+    // I know the number of locals
+    setFunctionType(funcType);
+    setFunctionLabel(funcName.value);
+
     // symbol
     writeTerminal(endSymbol);
 
@@ -126,6 +162,25 @@ function compilationEngine(tokenProvider, xmlWriter) {
     writeTerminal(getToken());
     // varDec*
     compileVarDec();
+
+    // Now that I know locals, we can write the
+    // function label.
+    const nLocals = varCount(VAR);
+    const funcLabel = getFunctionLabel()
+    writeFunction(funcLabel, nLocals);
+
+    const funcType = getFunctionType();
+    if (funcType === 'constructor') {
+      const nclassFields = varCount(FIELD);
+      writePush(segments.CONST, nclassFields);
+      writeCall('Memory.alloc', 1);
+      writePop(segments.POINTER, 0);
+    }
+
+    if (funcType === 'method') {
+      writePush(segments.ARG, 0);
+      writePop(segments.POINTER, 0);
+    }
 
     // statements
     compileStatements(getToken());
@@ -234,21 +289,47 @@ function compilationEngine(tokenProvider, xmlWriter) {
     const varOrClassName = getToken();
     writeTerminal(varOrClassName);
 
+    let funcName = varOrClassName.value
+
     // . or (
     let nextToken = getToken();
+
+    let otherClass = false
     if (notBrackets(nextToken.value)) {
+      otherClass = true
+
       // .
       writeTerminal(nextToken)
       // subroutineName
-      writeTerminal(getToken());
+      const subroutineNameToken = getToken()
+      writeTerminal(subroutineNameToken);
+
+      const type = typeOf(varOrClassName.value);
+      funcName = `${type}.${subroutineNameToken.value}`
+
       nextToken = getToken();
     }
+
+    const { incCallCount, getCallCount } = callCounter()
+
     // (
     writeTerminal(nextToken);
     // expressionList
-    compileExpressionList(getToken());
+    compileExpressionList(getToken(), incCallCount);
     // )
     writeTerminal(getToken());
+
+    let nArgs = getCallCount();
+    // call function
+    if (!otherClass) {
+      funcName = `${className}.${funcName}`
+      writePush(segments.POINTER, 0);
+      nArgs++;
+    }
+    writeCall(funcName, nArgs);
+    // do calls return nothing so remove returned
+    // constant 0
+    writePop(segments.TEMP, 0);
 
     // semi-colon
     writeTerminal(getToken());
@@ -261,7 +342,10 @@ function compilationEngine(tokenProvider, xmlWriter) {
     // let
     writeTerminal(letToken);
     // varName
-    writeTerminal(getToken());
+    const varNameToken = getToken();
+    writeTerminal(varNameToken);
+    const varIndex = indexOf(varNameToken.value);
+    const varSegment = kindOf(varNameToken.value);
 
     // squareBracket?
     let couldBeSquare = getToken();
@@ -280,12 +364,19 @@ function compilationEngine(tokenProvider, xmlWriter) {
     // expression
     compileExpression(getToken());
 
+    // Assign value at top of stack to
+    // variable
+    writePop(varSegment, varIndex);
+
     // ;
     writeTerminal(getToken());
     writeTagEnd('letStatement');
   }
 
   function compileWhile(whileToken) {
+    const { startLabel_L1, exitLabel_L2 } = getWhileLabels()
+    writeLabel(startLabel_L1);
+
     writeTagStart('whileStatement');
     // while
     writeTerminal(whileToken);
@@ -294,6 +385,11 @@ function compilationEngine(tokenProvider, xmlWriter) {
 
     // expression
     compileExpression(getToken());
+
+    // negate value at top of stack
+    writeArithmetic('not');
+    // evaluate if statement
+    writeIf(exitLabel_L2);
 
     // )
     writeTerminal(getToken());
@@ -307,19 +403,30 @@ function compilationEngine(tokenProvider, xmlWriter) {
     // }
     writeTerminal(getToken());
     writeTagEnd('whileStatement');
+
+    // go to top of loop
+    writeGoto(startLabel_L1);
+    // End Label
+    writeLabel(exitLabel_L2);
   }
 
   function compileReturn(returnToken) {
     writeTagStart('returnStatement');
+
     // return
     writeTerminal(returnToken);
     // expression ?
     const couldBeSemiColon = getToken();
+    let isVoid = true
     if (isNotSemiColon(couldBeSemiColon.value)) {
+      isVoid = false
       compileExpression(couldBeSemiColon);
     } else {
+      writePush(segments.CONST, 0);
       pushBack(1);
     }
+
+    writeReturn();
 
     // semicolon
     writeTerminal(getToken());
@@ -327,6 +434,7 @@ function compilationEngine(tokenProvider, xmlWriter) {
   }
 
   function compileIf(ifToken) {
+    const { ifTrue, ifFalse, ifEnd } = getIfElseLabels()
     writeTagStart('ifStatement');
     // if
     writeTerminal(ifToken);
@@ -337,19 +445,26 @@ function compilationEngine(tokenProvider, xmlWriter) {
     compileExpression(getToken());
 
     // )
+    writeIf(ifTrue)
+    writeGoto(ifFalse)
+    writeLabel(ifTrue)
     writeTerminal(getToken());
-
     // {
     writeTerminal(getToken());
 
     // statements
     compileStatements(getToken());
 
+    writeGoto(ifEnd)
+
     // }
     writeTerminal(getToken());
 
     const couldBeElse = getToken();
     if (isElse(couldBeElse.value)) {
+
+      writeLabel(ifFalse);
+
       writeTerminal(couldBeElse);
       // {
       writeTerminal(getToken());
@@ -360,6 +475,7 @@ function compilationEngine(tokenProvider, xmlWriter) {
     } else {
       pushBack(1);
     }
+    writeLabel(ifEnd)
     writeTagEnd('ifStatement');
   }
 
@@ -373,7 +489,20 @@ function compilationEngine(tokenProvider, xmlWriter) {
       // compile op
       writeTerminal(opToken);
       // compile term
-      compileTerm(getToken());
+      const termToken = getToken();
+      compileTerm(termToken);
+
+      switch (opToken.value) {
+        case '*':
+          writeCall('Math.multiply', 2);
+          break;
+        case '/':
+          writeCall('Math.divide', 2);
+          break;
+        default:
+          // push operation on to stack
+          writeArithmetic(opToken.value)
+      }
 
       opToken = getToken();
     }
@@ -389,12 +518,41 @@ function compilationEngine(tokenProvider, xmlWriter) {
     // keyword
     if (termIsSimpleConstant(firstTerm.type)) {
       writeTerminal(firstTerm)
+
+      if (firstTerm.type === 'integerConstant') {
+        writePush(segments.CONST, firstTerm.value);
+      }
+
+      // true, false, null, this
+      if (firstTerm.type === 'keyword') {
+        switch (firstTerm.value) {
+          case 'true':
+            writePush(segments.CONST, 0);
+            writeArithmetic('not');
+            break;
+          case 'false':
+          case 'null':
+            writePush(segments.CONST, 0);
+            break;
+          case 'this':
+            writePush(segments.POINTER, 0);
+        }
+      }
+
+      // need to handle string statements
+
     } else if (termIsSymbol(firstTerm.type)) {
       // symbol
       if (isUnary(firstTerm.value)){
         // unary op
         writeTerminal(firstTerm);
         compileTerm(getToken());
+        if (firstTerm.value === '~') {
+          writeArithmetic('not');
+        } else {
+          // negate value of term
+          writeArithmetic('neg');
+        }
       } else {
         // ( expression )
         writeTerminal(firstTerm)
@@ -417,49 +575,71 @@ function compilationEngine(tokenProvider, xmlWriter) {
           writeTerminal(getToken());
           break;
         // varName '(' expressionList ')'
-        case '(':
-          writeFunctionCall(lookAhead);
+        case '(': {
+          const { incCallCount, getCallCount } = callCounter();
+          const funcLabel = `${className}.${firstTerm.value}`;
+          writeFunctionCall(lookAhead, incCallCount);
+          writeCall(funcLabel, getCallCount());
           break;
+        }
         // varName.varName()
-        case '.':
+        case '.': {
           // varName
           writeTerminal(lookAhead);
+          
           // '.'
-          writeTerminal(getToken());
+          const subroutineName = getToken();
+          writeTerminal(subroutineName);
           // varName '(' expressionList ')'
-          writeFunctionCall(getToken());
+          const { incCallCount, getCallCount } = callCounter();
+          const funcLabel = `${firstTerm.value}.${subroutineName.value}`;
+          writeFunctionCall(getToken(), incCallCount);
+          writeCall(funcLabel, getCallCount());
           break;
+        }
         case ')':
         case ']':
-        default:
+        default: {
+          const { type, value } = firstTerm
+          if (type === 'identifier') {
+            const segment = kindOf(value);
+            const index = indexOf(value);
+            writePush(segment, index);
+          }
           pushBack(1);
+        }
+
       }
     }
     writeTagEnd('term');
   }
 
-  function writeFunctionCall(varName) {
+  function writeFunctionCall(varName, incCallCount) {
+    // if targetClassName append with 
+
     // varName
     writeTerminal(varName);
     // left bracket
     // expressionList
-    compileExpressionList(getToken());
+    const expressionToken = getToken()
+    compileExpressionList(expressionToken, incCallCount);
 
     // right bracket
     writeTerminal(getToken());
   }
 
-  function compileExpressionList(firstToken) {
+  function compileExpressionList(firstToken, incCallCount) {
     writeTagStart('expressionList');
     if (notRightBracket(firstToken.value)) {
       compileExpression(firstToken);
-  
+      incCallCount();
       let nextToken = getToken();
       while(notBrackets(nextToken.value)) {
         // ','
         writeTerminal(nextToken);
         // expression
         compileExpression(getToken());
+        incCallCount();
         nextToken = getToken();
       }
     }

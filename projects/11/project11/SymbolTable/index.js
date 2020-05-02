@@ -1,5 +1,5 @@
 const STATIC = 'static';
-const FIELD = 'field';
+const FIELD = 'this';
 const ARGS = 'args';
 const VAR = 'var';
 
@@ -14,6 +14,7 @@ function symbolTable() {
   }
 
   const define = (name, type, kind) => {
+    if (kind === 'field') { kind = 'this' }
     switch (kind) {
       case STATIC:
       case FIELD: {
@@ -23,7 +24,6 @@ function symbolTable() {
           count: counts[kind],
         };
         counts[kind]++;
-        console.log(classSymbols);
         break;
       }
       case ARGS:
@@ -34,7 +34,6 @@ function symbolTable() {
           kind,
           count,
         };
-        console.log(subroutineSymbols);
         counts[kind]++;
         break;
       }
@@ -52,11 +51,17 @@ function symbolTable() {
     if (classSymbols.hasOwnProperty(name)) {
       return classSymbols[name][prop];
     }
-    throw new Error(`Symbol ${name} is undefined`);
+    // throw new Error(`Symbol ${name} is undefined`);
   }
 
   const kindOf = (name) => {
-    return propOf('kind', name);
+    const map = {
+      [STATIC]: 'static',
+      [FIELD]: 'this',
+      [ARGS]: 'argument',
+      [VAR]: 'local',
+    }
+    return map[propOf('kind', name)];
   }
 
   const typeOf = (name) => {
