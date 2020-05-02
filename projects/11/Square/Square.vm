@@ -17,7 +17,7 @@ function Square.dispose 0
 push argument 0
 pop pointer 0
 push pointer 0
-call undefined.deAlloc 1
+call Memory.deAlloc 1
 pop temp 0
 push constant 0
 return
@@ -26,7 +26,7 @@ push argument 0
 pop pointer 0
 push constant 0
 not
-call undefined.setColor 1
+call Screen.setColor 1
 pop temp 0
 push this 0
 push this 1
@@ -36,7 +36,7 @@ add
 push this 1
 push this 2
 add
-call undefined.drawRectangle 4
+call Screen.drawRectangle 4
 pop temp 0
 push constant 0
 return
@@ -44,7 +44,7 @@ function Square.erase 0
 push argument 0
 pop pointer 0
 push constant 0
-call undefined.setColor 1
+call Screen.setColor 1
 pop temp 0
 push this 0
 push this 1
@@ -54,7 +54,7 @@ add
 push this 1
 push this 2
 add
-call undefined.drawRectangle 4
+call Screen.drawRectangle 4
 pop temp 0
 push constant 0
 return
@@ -85,8 +85,7 @@ pop this 2
 push pointer 0
 call Square.draw 1
 pop temp 0
-goto Square_IF_END0
-label Square_IF_END0
+label Square_IF_FALSE0
 push constant 0
 return
 function Square.decSize 0
@@ -108,8 +107,7 @@ pop this 2
 push pointer 0
 call Square.draw 1
 pop temp 0
-goto Square_IF_END1
-label Square_IF_END1
+label Square_IF_FALSE1
 push constant 0
 return
 function Square.moveUp 0
@@ -122,7 +120,7 @@ if-goto Square_IF_TRUE2
 goto Square_IF_FALSE2
 label Square_IF_TRUE2
 push constant 0
-call undefined.setColor 1
+call Screen.setColor 1
 pop temp 0
 push this 0
 push this 1
@@ -136,7 +134,7 @@ add
 push this 1
 push this 2
 add
-call undefined.drawRectangle 4
+call Screen.drawRectangle 4
 pop temp 0
 push this 1
 push constant 2
@@ -144,7 +142,7 @@ sub
 pop this 1
 push constant 0
 not
-call undefined.setColor 1
+call Screen.setColor 1
 pop temp 0
 push this 0
 push this 1
@@ -154,10 +152,9 @@ add
 push this 1
 push constant 1
 add
-call undefined.drawRectangle 4
+call Screen.drawRectangle 4
 pop temp 0
-goto Square_IF_END2
-label Square_IF_END2
+label Square_IF_FALSE2
 push constant 0
 return
 function Square.moveDown 0
@@ -172,7 +169,7 @@ if-goto Square_IF_TRUE3
 goto Square_IF_FALSE3
 label Square_IF_TRUE3
 push constant 0
-call undefined.setColor 1
+call Screen.setColor 1
 pop temp 0
 push this 0
 push this 1
@@ -182,7 +179,7 @@ add
 push this 1
 push constant 1
 add
-call undefined.drawRectangle 4
+call Screen.drawRectangle 4
 pop temp 0
 push this 1
 push constant 2
@@ -190,7 +187,7 @@ add
 pop this 1
 push constant 0
 not
-call undefined.setColor 1
+call Screen.setColor 1
 pop temp 0
 push this 0
 push this 1
@@ -204,10 +201,9 @@ add
 push this 1
 push this 2
 add
-call undefined.drawRectangle 4
+call Screen.drawRectangle 4
 pop temp 0
-goto Square_IF_END3
-label Square_IF_END3
+label Square_IF_FALSE3
 push constant 0
 return
 function Square.moveLeft 0
@@ -220,7 +216,7 @@ if-goto Square_IF_TRUE4
 goto Square_IF_FALSE4
 label Square_IF_TRUE4
 push constant 0
-call undefined.setColor 1
+call Screen.setColor 1
 pop temp 0
 push this 0
 push this 2
@@ -234,7 +230,7 @@ add
 push this 1
 push this 2
 add
-call undefined.drawRectangle 4
+call Screen.drawRectangle 4
 pop temp 0
 push this 0
 push constant 2
@@ -242,7 +238,7 @@ sub
 pop this 0
 push constant 0
 not
-call undefined.setColor 1
+call Screen.setColor 1
 pop temp 0
 push this 0
 push this 1
@@ -252,10 +248,9 @@ add
 push this 1
 push this 2
 add
-call undefined.drawRectangle 4
+call Screen.drawRectangle 4
 pop temp 0
-goto Square_IF_END4
-label Square_IF_END4
+label Square_IF_FALSE4
 push constant 0
 return
 function Square.moveRight 0
@@ -270,7 +265,7 @@ if-goto Square_IF_TRUE5
 goto Square_IF_FALSE5
 label Square_IF_TRUE5
 push constant 0
-call undefined.setColor 1
+call Screen.setColor 1
 pop temp 0
 push this 0
 push this 1
@@ -280,7 +275,7 @@ add
 push this 1
 push this 2
 add
-call undefined.drawRectangle 4
+call Screen.drawRectangle 4
 pop temp 0
 push this 0
 push constant 2
@@ -288,7 +283,7 @@ add
 pop this 0
 push constant 0
 not
-call undefined.setColor 1
+call Screen.setColor 1
 pop temp 0
 push this 0
 push this 2
@@ -302,9 +297,8 @@ add
 push this 1
 push this 2
 add
-call undefined.drawRectangle 4
+call Screen.drawRectangle 4
 pop temp 0
-goto Square_IF_END5
-label Square_IF_END5
+label Square_IF_FALSE5
 push constant 0
 return
