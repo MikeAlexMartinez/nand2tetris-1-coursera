@@ -14,10 +14,11 @@ return
 function SquareGame.dispose 0
 push argument 0
 pop pointer 0
-call Square.dispose 0
+push this 0
+call Square.dispose 1
 pop temp 0
 push pointer 0
-call undefined.deAlloc 1
+call Memory.deAlloc 1
 pop temp 0
 push constant 0
 return
@@ -30,42 +31,42 @@ eq
 if-goto SquareGame_IF_TRUE0
 goto SquareGame_IF_FALSE0
 label SquareGame_IF_TRUE0
-call Square.moveUp 0
+push this 0
+call Square.moveUp 1
 pop temp 0
-goto SquareGame_IF_END0
-label SquareGame_IF_END0
+label SquareGame_IF_FALSE0
 push this 1
 push constant 2
 eq
 if-goto SquareGame_IF_TRUE1
 goto SquareGame_IF_FALSE1
 label SquareGame_IF_TRUE1
-call Square.moveDown 0
+push this 0
+call Square.moveDown 1
 pop temp 0
-goto SquareGame_IF_END1
-label SquareGame_IF_END1
+label SquareGame_IF_FALSE1
 push this 1
 push constant 3
 eq
 if-goto SquareGame_IF_TRUE2
 goto SquareGame_IF_FALSE2
 label SquareGame_IF_TRUE2
-call Square.moveLeft 0
+push this 0
+call Square.moveLeft 1
 pop temp 0
-goto SquareGame_IF_END2
-label SquareGame_IF_END2
+label SquareGame_IF_FALSE2
 push this 1
 push constant 4
 eq
 if-goto SquareGame_IF_TRUE3
 goto SquareGame_IF_FALSE3
 label SquareGame_IF_TRUE3
-call Square.moveRight 0
+push this 0
+call Square.moveRight 1
 pop temp 0
-goto SquareGame_IF_END3
-label SquareGame_IF_END3
+label SquareGame_IF_FALSE3
 push constant 5
-call undefined.wait 1
+call Sys.wait 1
 pop temp 0
 push constant 0
 return
@@ -101,28 +102,27 @@ label SquareGame_IF_TRUE4
 push constant 0
 not
 pop local 1
-goto SquareGame_IF_END4
-label SquareGame_IF_END4
+label SquareGame_IF_FALSE4
 push local 0
 push constant 90
 eq
 if-goto SquareGame_IF_TRUE5
 goto SquareGame_IF_FALSE5
 label SquareGame_IF_TRUE5
-call Square.decSize 0
+push this 0
+call Square.decSize 1
 pop temp 0
-goto SquareGame_IF_END5
-label SquareGame_IF_END5
+label SquareGame_IF_FALSE5
 push local 0
 push constant 88
 eq
 if-goto SquareGame_IF_TRUE6
 goto SquareGame_IF_FALSE6
 label SquareGame_IF_TRUE6
-call Square.incSize 0
+push this 0
+call Square.incSize 1
 pop temp 0
-goto SquareGame_IF_END6
-label SquareGame_IF_END6
+label SquareGame_IF_FALSE6
 push local 0
 push constant 131
 eq
@@ -131,8 +131,7 @@ goto SquareGame_IF_FALSE7
 label SquareGame_IF_TRUE7
 push constant 1
 pop this 1
-goto SquareGame_IF_END7
-label SquareGame_IF_END7
+label SquareGame_IF_FALSE7
 push local 0
 push constant 133
 eq
@@ -141,8 +140,7 @@ goto SquareGame_IF_FALSE8
 label SquareGame_IF_TRUE8
 push constant 2
 pop this 1
-goto SquareGame_IF_END8
-label SquareGame_IF_END8
+label SquareGame_IF_FALSE8
 push local 0
 push constant 130
 eq
@@ -151,8 +149,7 @@ goto SquareGame_IF_FALSE9
 label SquareGame_IF_TRUE9
 push constant 3
 pop this 1
-goto SquareGame_IF_END9
-label SquareGame_IF_END9
+label SquareGame_IF_FALSE9
 push local 0
 push constant 132
 eq
@@ -161,8 +158,7 @@ goto SquareGame_IF_FALSE10
 label SquareGame_IF_TRUE10
 push constant 4
 pop this 1
-goto SquareGame_IF_END10
-label SquareGame_IF_END10
+label SquareGame_IF_FALSE10
 label SquareGame_WHILE_EXP2
 push local 0
 push constant 0

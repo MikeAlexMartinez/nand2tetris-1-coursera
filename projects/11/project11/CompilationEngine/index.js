@@ -290,9 +290,11 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
     writeTerminal(varOrClassName);
 
     let funcName = varOrClassName.value
-
+    const type = typeOf(funcName);
+    const { incCallCount, getCallCount } = callCounter()
+    
     // . or (
-    let nextToken = getToken();
+      let nextToken = getToken();
 
     let otherClass = false
     if (notBrackets(nextToken.value)) {
@@ -304,13 +306,18 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
       const subroutineNameToken = getToken()
       writeTerminal(subroutineNameToken);
 
-      const type = typeOf(varOrClassName.value);
-      funcName = `${type}.${subroutineNameToken.value}`
+      if (type) {
+        const kind = kindOf(funcName);
+        const index = indexOf(funcName);
+        writePush(kind, index);
+        incCallCount();
+        funcName = `${type}.${subroutineNameToken.value}`
+      } else {
+        funcName += `.${subroutineNameToken.value}`
+      }
 
       nextToken = getToken();
     }
-
-    const { incCallCount, getCallCount } = callCounter()
 
     // (
     writeTerminal(nextToken);
@@ -319,13 +326,13 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
     // )
     writeTerminal(getToken());
 
-    let nArgs = getCallCount();
     // call function
     if (!otherClass) {
       funcName = `${className}.${funcName}`
+      incCallCount()
       writePush(segments.POINTER, 0);
-      nArgs++;
     }
+    let nArgs = getCallCount();
     writeCall(funcName, nArgs);
     // do calls return nothing so remove returned
     // constant 0
@@ -445,24 +452,24 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
     compileExpression(getToken());
 
     // )
+    writeTerminal(getToken());
+
     writeIf(ifTrue)
     writeGoto(ifFalse)
     writeLabel(ifTrue)
-    writeTerminal(getToken());
+
     // {
     writeTerminal(getToken());
 
     // statements
     compileStatements(getToken());
-
-    writeGoto(ifEnd)
-
+    
     // }
     writeTerminal(getToken());
-
+    
     const couldBeElse = getToken();
     if (isElse(couldBeElse.value)) {
-
+      writeGoto(ifEnd)
       writeLabel(ifFalse);
 
       writeTerminal(couldBeElse);
@@ -472,10 +479,11 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
       compileStatements(getToken());
       // }
       writeTerminal(getToken());
+      writeLabel(ifEnd)
     } else {
+      writeLabel(ifFalse);
       pushBack(1);
     }
-    writeLabel(ifEnd)
     writeTagEnd('ifStatement');
   }
 
@@ -521,6 +529,18 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
 
       if (firstTerm.type === 'integerConstant') {
         writePush(segments.CONST, firstTerm.value);
+      }
+
+      if (firstTerm.type === 'stringConstant') {
+        const stringValue = firstTerm.value
+        const length = stringValue.length
+        writePush(segments.CONST, length);
+        writeCall('String.new', 1);
+        for (let i = 0; i < length; i ++) {
+          const code = stringValue.charCodeAt(i);
+          writePush(segments.CONST, code);
+          writeCall('String.appendChar', 2);
+        }
       }
 
       // true, false, null, this
