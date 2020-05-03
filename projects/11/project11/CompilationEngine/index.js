@@ -319,6 +319,13 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
       nextToken = getToken();
     }
 
+    // call function
+    if (!otherClass) {
+      funcName = `${className}.${funcName}`
+      incCallCount();
+      writePush(segments.POINTER, 0);
+    }
+
     // (
     writeTerminal(nextToken);
     // expressionList
@@ -326,12 +333,6 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
     // )
     writeTerminal(getToken());
 
-    // call function
-    if (!otherClass) {
-      funcName = `${className}.${funcName}`
-      incCallCount()
-      writePush(segments.POINTER, 0);
-    }
     let nArgs = getCallCount();
     writeCall(funcName, nArgs);
     // do calls return nothing so remove returned
@@ -636,7 +637,18 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
           writeTerminal(subroutineName);
           // varName '(' expressionList ')'
           const { incCallCount, getCallCount } = callCounter();
-          const funcLabel = `${firstTerm.value}.${subroutineName.value}`;
+          
+          const type = typeOf(firstTerm.value);
+          let funcLabel
+          if (type) {
+            const index = indexOf(firstTerm.value);
+            writePush(segments.THIS, index);
+            incCallCount();
+            funcLabel = `${type}.${subroutineName.value}`;
+          } else {
+            funcLabel = `${firstTerm.value}.${subroutineName.value}`;
+          }
+
           writeFunctionCall(getToken(), incCallCount);
           writeCall(funcLabel, getCallCount());
           break;
@@ -647,7 +659,13 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
           const { type, value } = firstTerm
           if (type === 'identifier') {
             const segment = kindOf(value);
-            const index = indexOf(value);
+            let index = indexOf(value);
+            if (
+                getFunctionType() === 'method'
+              && segment === segments.ARG
+            ) {
+              index += 1;
+            }
             writePush(segment, index);
           }
           pushBack(1);
