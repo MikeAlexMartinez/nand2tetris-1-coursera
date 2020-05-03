@@ -531,6 +531,18 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
         writePush(segments.CONST, firstTerm.value);
       }
 
+      if (firstTerm.type === 'stringConstant') {
+        const stringValue = firstTerm.value
+        const length = stringValue.length
+        writePush(segments.CONST, length);
+        writeCall('String.new', 1);
+        for (let i = 0; i < length; i ++) {
+          const code = stringValue.charCodeAt(i);
+          writePush(segments.CONST, code);
+          writeCall('String.appendChar', 2);
+        }
+      }
+
       // true, false, null, this
       if (firstTerm.type === 'keyword') {
         switch (firstTerm.value) {
