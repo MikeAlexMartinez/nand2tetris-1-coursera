@@ -356,10 +356,17 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
 
     // squareBracket?
     let couldBeSquare = getToken();
-    if (isLeftSquareBracket(couldBeSquare.value)) {
+    const assignToArray = isLeftSquareBracket(couldBeSquare.value);
+    if (assignToArray) {
       writeTerminal(couldBeSquare);
+
       // expression
       compileExpression(getToken());
+
+      // add index to base address of array
+      writePush(varSegment, varIndex)
+      writeArithmetic('add');
+
       // endSquare
       writeTerminal(getToken());
 
@@ -371,9 +378,16 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
     // expression
     compileExpression(getToken());
 
-    // Assign value at top of stack to
-    // variable
-    writePop(varSegment, varIndex);
+    if (assignToArray) {
+      writePop(segments.TEMP, 0);
+      writePop(segments.POINTER, 1);
+      writePush(segments.TEMP, 0);
+      writePop(segments.THAT, 0);
+    } else {
+      // Assign value at top of stack to
+      // variable
+      writePop(varSegment, varIndex);
+    }
 
     // ;
     writeTerminal(getToken());
@@ -588,16 +602,20 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
       switch (lookAhead.value) {
         // varName [ expression ]
         case '[':
-          const memSegment = kindOf(firstTerm.value)
-          const index = indexOf(firstTerm.value)
-          writePush(memSegment, index)
           writeTerminal(lookAhead);
           // expression
           compileExpression(getToken());
-          // ]
-          writePop(segments.POINTER, 1);
 
-          write
+          // add index to base address of array
+          const varSegment = kindOf(firstTerm.value)
+          const varIndex = indexOf(firstTerm.value)
+          writePush(varSegment, varIndex);
+          writeArithmetic('add');
+
+          writePop(segments.POINTER, 1);
+          writePush(segments.THAT, 0);
+
+          // ]
           writeTerminal(getToken());
           break;
         // varName '(' expressionList ')'

@@ -6,6 +6,7 @@ const ARG = 'argument'
 const LOCAL = 'local'
 const STATIC = 'static'
 const THIS = 'this'
+const THAT = 'that'
 const POINTER = 'pointer'
 const TEMP = 'temp'
 
@@ -15,6 +16,7 @@ const segments = {
   LOCAL,
   STATIC,
   THIS,
+  THAT,
   POINTER,
   TEMP,
 }
