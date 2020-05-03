@@ -568,10 +568,16 @@ function compilationEngine(tokenProvider, xmlWriter, vmWriter) {
       switch (lookAhead.value) {
         // varName [ expression ]
         case '[':
+          const memSegment = kindOf(firstTerm.value)
+          const index = indexOf(firstTerm.value)
+          writePush(memSegment, index)
           writeTerminal(lookAhead);
           // expression
           compileExpression(getToken());
           // ]
+          writePop(segments.POINTER, 1);
+
+          write
           writeTerminal(getToken());
           break;
         // varName '(' expressionList ')'
